@@ -1,0 +1,28 @@
+{
+  "name": "bruno-api-catalog",
+  "version": "1.0.0",
+  "description": "Automated catalog of OpenAPI specifications from GitHub with Bruno integration",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "keywords": [
+    "bruno",
+    "openapi",
+    "api",
+    "catalog",
+    "documentation",
+    "github"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/rest": "^20.0.2",
+    "better-sqlite3": "^9.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  }
+}

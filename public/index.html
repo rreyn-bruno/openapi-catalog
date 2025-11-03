@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bruno API Catalog</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+    
+    .search-bar {
+      background: white;
+      padding: 2rem;
+      margin: -2rem auto 2rem;
+      max-width: 800px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    input[type="search"] {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    
+    input[type="search"]:focus {
+      border-color: #667eea;
+    }
+    
+    .stats {
+      display: flex;
+      gap: 2rem;
+      margin: 2rem 0;
+      justify-content: center;
+    }
+    
+    .stat {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #667eea;
+    }
+    
+    .stat-label {
+      color: #666;
+      margin-top: 0.5rem;
+    }
+    
+    .api-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+    }
+    
+    .api-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    
+    .api-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .api-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    
+    .api-description {
+      color: #666;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .api-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.9rem;
+      color: #999;
+      margin-bottom: 1rem;
+    }
+    
+    .api-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .tag {
+      background: #f0f0f0;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    
+    .api-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 4rem;
+      color: #999;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 4rem;
+      color: #999;
+    }
+    
+    .empty-state h2 {
+      margin-bottom: 1rem;
+    }
+    
+    .scrape-btn {
+      margin: 2rem auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>🚀 Bruno API Catalog</h1>
+      <p class="subtitle">Discover and explore OpenAPI specifications from GitHub</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="search-bar">
+      <input type="search" id="searchInput" placeholder="Search APIs...">
+    </div>
+
+    <div class="stats" id="stats">
+      <div class="stat">
+        <div class="stat-value" id="totalApis">-</div>
+        <div class="stat-label">APIs</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="totalTags">-</div>
+        <div class="stat-label">Tags</div>
+      </div>
+    </div>
+
+    <div id="content">
+      <div class="loading">Loading APIs...</div>
+    </div>
+  </div>
+
+  <script>
+    let allApis = [];
+
+    // Load stats
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/stats');
+        const stats = await res.json();
+        document.getElementById('totalApis').textContent = stats.totalApis;
+        document.getElementById('totalTags').textContent = stats.totalTags;
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      }
+    }
+
+    // Load APIs
+    async function loadApis() {
+      try {
+        const res = await fetch('/api/apis');
+        const data = await res.json();
+        allApis = data.apis;
+        renderApis(allApis);
+      } catch (error) {
+        console.error('Error loading APIs:', error);
+        document.getElementById('content').innerHTML = `
+          <div class="empty-state">
+            <h2>Error loading APIs</h2>
+            <p>${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Render APIs
+    function renderApis(apis) {
+      const content = document.getElementById('content');
+      
+      if (apis.length === 0) {
+        content.innerHTML = `
+          <div class="empty-state">
+            <h2>No APIs found</h2>
+            <p>Start by scraping GitHub for OpenAPI specifications</p>
+            <button class="btn btn-primary scrape-btn" onclick="triggerScrape()">
+              Start Scraping
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const grid = document.createElement('div');
+      grid.className = 'api-grid';
+
+      apis.forEach(api => {
+        const card = document.createElement('div');
+        card.className = 'api-card';
+        card.onclick = () => window.open(`/docs/${api.id}/index.html`, '_blank');
+
+        const tags = api.tags?.map(t => `<span class="tag">${t.name}</span>`).join('') || '';
+
+        card.innerHTML = `
+          <div class="api-name">${api.name}</div>
+          <div class="api-description">${api.description || 'No description available'}</div>
+          <div class="api-meta">
+            <span>⭐ ${api.stars}</span>
+            <span>v${api.version}</span>
+          </div>
+          ${tags ? `<div class="api-tags">${tags}</div>` : ''}
+          <div class="api-actions">
+            <a href="/docs/${api.id}/index.html" target="_blank" class="btn btn-primary" onclick="event.stopPropagation()">
+              View Docs
+            </a>
+            <a href="${api.github_url}" target="_blank" class="btn btn-secondary" onclick="event.stopPropagation()">
+              GitHub
+            </a>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      content.innerHTML = '';
+      content.appendChild(grid);
+    }
+
+    // Search
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const filtered = allApis.filter(api => 
+        api.name.toLowerCase().includes(query) ||
+        (api.description && api.description.toLowerCase().includes(query))
+      );
+      renderApis(filtered);
+    });
+
+    // Trigger scrape
+    async function triggerScrape() {
+      if (!confirm('This will search GitHub for OpenAPI files and process them. Continue?')) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/scrape', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ minStars: 10, maxResults: 10 })
+        });
+        const data = await res.json();
+        alert(`Scrape started! Run ID: ${data.runId}\n\nCheck the server console for progress.`);
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      }
+    }
+
+    // Initialize
+    loadStats();
+    loadApis();
+  </script>
+</body>
+</html>
