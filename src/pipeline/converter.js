@@ -2,15 +2,18 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 const path = require('path');
 const fs = require('fs').promises;
+const yaml = require('js-yaml');
 
 const execAsync = promisify(exec);
 
 class ConversionPipeline {
   constructor(options = {}) {
-    this.brunoDocGenPath = options.brunoDocGenPath || '../bruno-doc-gen';
-    this.collectionsDir = options.collectionsDir || './data/collections';
-    this.docsDir = options.docsDir || './data/docs';
-    this.openapiDir = options.openapiDir || './data/openapi';
+    // Use absolute paths to avoid issues when changing directories
+    const rootDir = path.resolve(__dirname, '../..');
+    this.brunoDocGenPath = options.brunoDocGenPath || path.resolve(rootDir, '../bruno-doc-gen');
+    this.collectionsDir = options.collectionsDir || path.resolve(rootDir, 'data/collections');
+    this.docsDir = options.docsDir || path.resolve(rootDir, 'data/docs');
+    this.openapiDir = options.openapiDir || path.resolve(rootDir, 'data/openapi');
   }
 
   /**
@@ -59,13 +62,48 @@ class ConversionPipeline {
   async downloadOpenAPISpec(id, url) {
     const filename = `${id}.json`;
     const filepath = path.join(this.openapiDir, filename);
-    
+
     // Ensure directory exists
     await fs.mkdir(this.openapiDir, { recursive: true });
-    
+
     // Download using curl
     await execAsync(`curl -L "${url}" -o "${filepath}"`);
-    
+
+    // Validate and convert if needed
+    let content = await fs.readFile(filepath, 'utf-8');
+
+    // Try to parse as JSON first
+    let isValidSpec = false;
+    try {
+      const parsed = JSON.parse(content);
+      // Check if it looks like an OpenAPI spec
+      if (parsed.openapi || parsed.swagger) {
+        isValidSpec = true;
+      } else {
+        throw new Error('Not a valid OpenAPI specification (missing openapi/swagger field)');
+      }
+    } catch (jsonError) {
+      // If not JSON, try to parse as YAML
+      try {
+        const yamlContent = yaml.load(content);
+        if (yamlContent && (yamlContent.openapi || yamlContent.swagger)) {
+          // Convert YAML to JSON
+          console.log('  Converting YAML to JSON...');
+          content = JSON.stringify(yamlContent, null, 2);
+          await fs.writeFile(filepath, content, 'utf-8');
+          isValidSpec = true;
+        } else {
+          throw new Error('Not a valid OpenAPI specification (missing openapi/swagger field)');
+        }
+      } catch (yamlError) {
+        throw new Error('Downloaded file is not a valid OpenAPI spec (not JSON or YAML)');
+      }
+    }
+
+    if (!isValidSpec) {
+      throw new Error('Downloaded file is not a valid OpenAPI specification');
+    }
+
     return filepath;
   }
 

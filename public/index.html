@@ -3,247 +3,695 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bruno API Catalog</title>
+  <title>Bruno API Catalog - Discover OpenAPI Specifications</title>
+  <meta name="description" content="Browse and explore a curated catalog of OpenAPI specifications from GitHub, ready to import into Bruno API client.">
   <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #e09a31;
+      --secondary: #2d3748;
+      --accent: #4299e1;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f7fafc;
+      --bg-tertiary: #edf2f7;
+      --text-primary: #1a202c;
+      --text-secondary: #4a5568;
+      --text-muted: #718096;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: #f5f5f5;
-      color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      line-height: 1.6;
     }
-    
+
     header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 2rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-    }
-    
-    .subtitle {
-      opacity: 0.9;
-      font-size: 1.1rem;
-    }
-    
-    .search-bar {
-      background: white;
-      padding: 2rem;
-      margin: -2rem auto 2rem;
-      max-width: 800px;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-    
-    input[type="search"] {
-      width: 100%;
-      padding: 1rem;
-      font-size: 1rem;
-      border: 2px solid #e0e0e0;
-      border-radius: 6px;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-    
-    input[type="search"]:focus {
-      border-color: #667eea;
-    }
-    
-    .stats {
-      display: flex;
-      gap: 2rem;
-      margin: 2rem 0;
-      justify-content: center;
-    }
-    
-    .stat {
-      text-align: center;
-    }
-    
-    .stat-value {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #667eea;
-    }
-    
-    .stat-label {
-      color: #666;
-      margin-top: 0.5rem;
-    }
-    
-    .api-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 2rem;
-      padding: 2rem;
-    }
-    
-    .api-card {
-      background: white;
-      border-radius: 8px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      transition: transform 0.2s, box-shadow 0.2s;
-      cursor: pointer;
-    }
-    
-    .api-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-    
-    .api-name {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: #333;
-    }
-    
-    .api-description {
-      color: #666;
-      margin-bottom: 1rem;
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
+      color: #ffffff;
+      padding: 1.5rem 0 1rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
       overflow: hidden;
     }
-    
-    .api-meta {
+
+    header .container {
+      padding: 0 2rem;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,0,0,0.03)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      opacity: 0.3;
+    }
+
+    .container {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .header-text {
+      text-align: left !important;
+      flex: 1;
+    }
+
+    .header-text h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: flex-start;
+      color: #ffffff;
+    }
+
+    .logo {
+      height: 2rem;
+      width: auto;
+      display: inline-block;
+    }
+
+    .subtitle {
+      opacity: 1;
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: #ffffff;
+      text-align: left !important;
+    }
+
+    .subtitle strong {
+      font-weight: 700;
+    }
+
+    .header-text h1 .logo {
+      margin-right: 0.5rem;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 1.5rem;
+      background: rgba(255, 255, 255, 0.5);
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .header-stat {
+      text-align: center;
+    }
+
+    .header-stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .header-stat-label {
+      font-size: 0.7rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+
+    .search-section {
+      background: transparent;
+      padding: 2rem 2rem 1.5rem;
+      margin: 0;
+      max-width: 100%;
+    }
+
+    .search-controls {
       display: flex;
       gap: 1rem;
-      font-size: 0.9rem;
-      color: #999;
+      align-items: center;
       margin-bottom: 1rem;
+      flex-wrap: wrap;
     }
-    
+
+    .search-controls label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .search-controls select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-controls select:hover {
+      border-color: var(--primary);
+    }
+
+    .search-controls select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(244, 170, 65, 0.1);
+    }
+
+    .search-wrapper {
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    input[type="search"] {
+      width: 100%;
+      padding: 1rem 1rem 1rem 3rem;
+      font-size: 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.3s;
+      background: var(--bg-primary);
+    }
+
+    input[type="search"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(244, 170, 65, 0.1);
+    }
+
+    .filter-tags {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-tag {
+      padding: 0.5rem 1rem;
+      background: var(--bg-tertiary);
+      border: 2px solid transparent;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .filter-tag:hover {
+      background: var(--bg-secondary);
+      border-color: var(--primary);
+    }
+
+    .filter-tag.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .api-table-container {
+      padding: 0 2rem 4rem;
+      overflow-x: auto;
+      margin-top: 0;
+    }
+
+    .api-table {
+      width: 100%;
+      background: var(--bg-primary);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      table-layout: fixed;
+    }
+
+    .api-table thead {
+      background: var(--bg-tertiary);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .api-table th {
+      padding: 1rem 1.5rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+
+    .api-table th:nth-child(1) { width: 40%; }  /* API (Name/Description) */
+    .api-table th:nth-child(2) { width: 15%; }  /* Tags */
+    .api-table th:nth-child(3) { width: 12%; }  /* Source */
+    .api-table th:nth-child(4) { width: 8%; }   /* Version */
+    .api-table th:nth-child(5) { width: 25%; }  /* Actions */
+
+    .api-table tbody tr {
+      border-bottom: 1px solid #d1d5db;
+      transition: background-color 0.2s;
+    }
+
+    .api-table tbody tr:hover {
+      background: var(--bg-secondary);
+    }
+
+    .api-table tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .api-table td {
+      padding: 1.25rem 1.5rem;
+      vertical-align: middle;
+    }
+
+    .api-table td:nth-child(1) {
+      max-width: 600px;
+    }
+
+    .api-table td:nth-child(2) {
+      max-width: 200px;
+    }
+
+    .api-name {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .api-description {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      word-break: break-word;
+    }
+
+    .api-stars {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--bg-tertiary);
+      padding: 0.375rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
     .api-tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+      gap: 0.375rem;
+      max-height: 3rem;
+      overflow: hidden;
     }
-    
+
     .tag {
-      background: #f0f0f0;
-      padding: 0.25rem 0.75rem;
+      background: var(--bg-tertiary);
+      padding: 0.25rem 0.625rem;
       border-radius: 12px;
-      font-size: 0.85rem;
-      color: #666;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: all 0.2s;
+      white-space: nowrap;
     }
-    
+
+    .tag:hover {
+      background: var(--primary);
+      color: var(--text-primary);
+    }
+
     .api-actions {
       display: flex;
       gap: 0.5rem;
+      white-space: nowrap;
     }
-    
+
     .btn {
       padding: 0.5rem 1rem;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.875rem;
+      font-weight: 600;
       transition: all 0.2s;
       text-decoration: none;
-      display: inline-block;
-      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
     }
-    
+
     .btn-primary {
-      background: #667eea;
-      color: white;
+      background: #f4aa41;
+      color: #000000;
     }
-    
+
     .btn-primary:hover {
-      background: #5568d3;
+      background: #e89a31;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
     }
-    
+
     .btn-secondary {
-      background: #f0f0f0;
-      color: #333;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
     }
-    
+
     .btn-secondary:hover {
-      background: #e0e0e0;
+      background: var(--bg-secondary);
+      border-color: var(--text-muted);
     }
-    
+
     .loading {
       text-align: center;
-      padding: 4rem;
-      color: #999;
+      padding: 6rem 2rem;
+      color: var(--text-muted);
     }
-    
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     .empty-state {
       text-align: center;
-      padding: 4rem;
-      color: #999;
+      padding: 6rem 2rem;
+      color: var(--text-muted);
     }
-    
+
     .empty-state h2 {
       margin-bottom: 1rem;
+      color: var(--text-primary);
+      font-size: 2rem;
     }
-    
-    .scrape-btn {
-      margin: 2rem auto;
-      display: block;
+
+    .empty-state p {
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+    }
+
+    footer {
+      background: var(--secondary);
+      color: #e2e8f0;
+      padding: 3rem 2rem;
+      margin-top: 4rem;
+      text-align: center;
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .header-text h1 {
+        font-size: 2rem;
+      }
+
+      .header-stats {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .api-table-container {
+        padding: 0 1rem 2rem;
+      }
+
+      .api-table {
+        font-size: 0.875rem;
+      }
+
+      .api-table th,
+      .api-table td {
+        padding: 0.75rem 0.5rem;
+      }
+
+      .api-table th:nth-child(4),
+      .api-table td:nth-child(4) {
+        display: none;
+      }
+
+      .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.8125rem;
+      }
     }
   </style>
 </head>
 <body>
   <header>
     <div class="container">
-      <h1>🚀 Bruno API Catalog</h1>
-      <p class="subtitle">Discover and explore OpenAPI specifications from GitHub</p>
+      <div class="header-content">
+        <div class="header-text">
+          <h1>
+            <span>OpenAPI Catalog</span>
+          </h1>
+          <p class="subtitle">Explore the <strong>largest</strong> OpenAPI-backed API Catalog - complete with Bruno Collections.</p>
+        </div>
+        <div class="header-stats">
+          <div class="header-stat">
+            <div class="header-stat-value" id="totalApis">-</div>
+            <div class="header-stat-label">APIs</div>
+          </div>
+          <div class="header-stat">
+            <div class="header-stat-value" id="totalTags">-</div>
+            <div class="header-stat-label">Categories</div>
+          </div>
+          <div class="header-stat">
+            <a href="/about.html" style="text-decoration: none; color: inherit;">
+              <div class="header-stat-value" style="font-size: 1.5rem;">ℹ️</div>
+              <div class="header-stat-label">About</div>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
   <div class="container">
-    <div class="search-bar">
-      <input type="search" id="searchInput" placeholder="Search APIs...">
-    </div>
-
-    <div class="stats" id="stats">
-      <div class="stat">
-        <div class="stat-value" id="totalApis">-</div>
-        <div class="stat-label">APIs</div>
+    <div class="search-section">
+      <div class="search-controls">
+        <label>
+          Sort by:
+          <select id="sortBy">
+            <option value="created_at">Recently Added</option>
+            <option value="stars">Most Stars</option>
+            <option value="name">Name (A-Z)</option>
+          </select>
+        </label>
+        <label>
+          Category:
+          <select id="categoryFilter">
+            <option value="">All Categories</option>
+          </select>
+        </label>
       </div>
-      <div class="stat">
-        <div class="stat-value" id="totalTags">-</div>
-        <div class="stat-label">Tags</div>
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="search" id="searchInput" placeholder="Search APIs by name, description, or tags...">
+      </div>
+      <div class="filter-tags" id="filterTags">
+        <!-- Tags will be populated here -->
       </div>
     </div>
 
     <div id="content">
-      <div class="loading">Loading APIs...</div>
+      <div class="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading APIs...</p>
+      </div>
     </div>
   </div>
 
+  <footer>
+    <div class="container">
+      <p>Built for the <a href="https://www.usebruno.com/" target="_blank">Bruno</a> API client community</p>
+      <p style="margin-top: 0.5rem; opacity: 0.8; font-size: 0.875rem;">
+        Powered by OpenAPI specifications from GitHub
+      </p>
+    </div>
+  </footer>
+
   <script>
     let allApis = [];
+    let allTags = [];
+    let activeFilter = null;
 
     // Load stats
     async function loadStats() {
       try {
         const res = await fetch('/api/stats');
         const stats = await res.json();
-        document.getElementById('totalApis').textContent = stats.totalApis;
-        document.getElementById('totalTags').textContent = stats.totalTags;
+        document.getElementById('totalApis').textContent = stats.totalApis || 0;
+        document.getElementById('totalTags').textContent = stats.totalTags || 0;
       } catch (error) {
         console.error('Error loading stats:', error);
       }
+    }
+
+    // Load tags for filtering
+    async function loadTags() {
+      try {
+        const res = await fetch('/api/tags');
+        const data = await res.json();
+        // Handle both array and object response
+        allTags = Array.isArray(data) ? data : (data.tags || []);
+        renderFilterTags();
+        populateCategoryDropdown();
+      } catch (error) {
+        console.error('Error loading tags:', error);
+      }
+    }
+
+    // Populate category dropdown
+    function populateCategoryDropdown() {
+      const select = document.getElementById('categoryFilter');
+      const currentValue = select.value;
+
+      // Keep "All Categories" option and add tags
+      const options = '<option value="">All Categories</option>' +
+        allTags.map(tag => `<option value="${tag.name}">${tag.name}${tag.count ? ` (${tag.count})` : ''}</option>`).join('');
+
+      select.innerHTML = options;
+      select.value = currentValue; // Restore selection
+    }
+
+    // Render filter tags
+    function renderFilterTags() {
+      const container = document.getElementById('filterTags');
+      if (!allTags || allTags.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      const topTags = allTags.slice(0, 10); // Show top 10 tags
+      container.innerHTML = topTags.map(tag => `
+        <div class="filter-tag" onclick="toggleFilter('${tag.name}')">
+          ${normalizeTagName(tag.name)}${tag.count ? ` (${tag.count})` : ''}
+        </div>
+      `).join('');
+    }
+
+    // Toggle filter
+    function toggleFilter(tagName) {
+      if (activeFilter === tagName) {
+        activeFilter = null;
+      } else {
+        activeFilter = tagName;
+      }
+
+      // Update UI
+      document.querySelectorAll('.filter-tag').forEach(el => {
+        if (el.textContent.startsWith(tagName)) {
+          el.classList.toggle('active');
+        } else {
+          el.classList.remove('active');
+        }
+      });
+
+      // Filter APIs
+      filterApis();
+    }
+
+    // Filter APIs based on search and active filter
+    function filterApis() {
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      const sortBy = document.getElementById('sortBy').value;
+
+      let filtered = allApis;
+
+      // Apply tag filter (normalize both sides for comparison)
+      if (activeFilter) {
+        filtered = filtered.filter(api =>
+          api.tags && api.tags.some(tag =>
+            normalizeTagName(tag).toLowerCase() === normalizeTagName(activeFilter).toLowerCase()
+          )
+        );
+      }
+
+      // Apply search filter
+      if (searchQuery) {
+        filtered = filtered.filter(api =>
+          (api.name && api.name.toLowerCase().includes(searchQuery)) ||
+          (api.description && api.description.toLowerCase().includes(searchQuery)) ||
+          (api.tags && api.tags.some(tag => tag.toLowerCase().includes(searchQuery)))
+        );
+      }
+
+      // Apply sorting
+      filtered = [...filtered]; // Create a copy to avoid mutating original
+      if (sortBy === 'stars') {
+        filtered.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+      } else if (sortBy === 'name') {
+        filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      } else if (sortBy === 'created_at') {
+        filtered.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      }
+
+      renderApis(filtered);
     }
 
     // Load APIs
@@ -264,90 +712,166 @@
       }
     }
 
+    // Normalize tag names for display
+    function normalizeTagName(tagName) {
+      const tagMap = {
+        'cloud': 'Cloud & Infrastructure',
+        'backend': 'Backend & Infrastructure',
+        'developer_tools': 'Developer Tools',
+        'customer_relation': 'Customer Relations',
+        'ecommerce': 'eCommerce',
+        'machine_learning': 'Machine Learning',
+        'open_data': 'Open Data',
+        'payment': 'Payments',
+        'project_management': 'Project Management',
+        'time_management': 'Time Management',
+        'social': 'Social Media',
+        'storage': 'Storage & Data',
+        'telecom': 'Telecommunications',
+        'transport': 'Transportation'
+      };
+
+      const normalized = tagMap[tagName.toLowerCase()];
+      return normalized || tagName.charAt(0).toUpperCase() + tagName.slice(1);
+    }
+
     // Render APIs
     function renderApis(apis) {
       const content = document.getElementById('content');
-      
+
       if (apis.length === 0) {
+        const message = activeFilter || document.getElementById('searchInput').value
+          ? 'No APIs match your search criteria'
+          : 'No APIs in the catalog yet';
+
         content.innerHTML = `
           <div class="empty-state">
-            <h2>No APIs found</h2>
-            <p>Start by scraping GitHub for OpenAPI specifications</p>
-            <button class="btn btn-primary scrape-btn" onclick="triggerScrape()">
-              Start Scraping
-            </button>
+            <h2>📭 ${message}</h2>
+            <p>Try adjusting your search or filters</p>
           </div>
         `;
         return;
       }
 
-      const grid = document.createElement('div');
-      grid.className = 'api-grid';
+      const stars = api => {
+        const count = api.stars || 0;
+        return count >= 1000 ? `${(count / 1000).toFixed(1)}k` : count;
+      };
 
-      apis.forEach(api => {
-        const card = document.createElement('div');
-        card.className = 'api-card';
-        card.onclick = () => window.open(`/docs/${api.id}/index.html`, '_blank');
+      const tableHTML = `
+        <div class="api-table-container">
+          <table class="api-table">
+            <thead>
+              <tr>
+                <th>API</th>
+                <th>Tags</th>
+                <th>Source</th>
+                <th>Version</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${apis.map(api => {
+                const tags = api.tags && api.tags.length > 0
+                  ? api.tags.slice(0, 3).map(tag => {
+                      const tagName = typeof tag === 'string' ? tag : tag.name;
+                      const displayName = normalizeTagName(tagName);
+                      return `<span class="tag">${displayName}</span>`;
+                    }).join('')
+                  : '<span class="tag">Uncategorized</span>';
 
-        const tags = api.tags?.map(t => `<span class="tag">${t.name}</span>`).join('') || '';
+                // Determine source link
+                const sourceUrl = api.github_url || api.source_url;
+                const isGitHub = sourceUrl && sourceUrl.includes('github.com');
+                const sourceLabel = isGitHub ? 'GitHub' : 'Source';
+                const sourceBadge = api.source === 'apis-guru'
+                  ? '<span class="tag" style="background: #8b5cf6; color: white;">APIs.guru</span>'
+                  : '<span class="tag" style="background: #3b82f6; color: white;">GitHub</span>';
 
-        card.innerHTML = `
-          <div class="api-name">${api.name}</div>
-          <div class="api-description">${api.description || 'No description available'}</div>
-          <div class="api-meta">
-            <span>⭐ ${api.stars}</span>
-            <span>v${api.version}</span>
-          </div>
-          ${tags ? `<div class="api-tags">${tags}</div>` : ''}
-          <div class="api-actions">
-            <a href="/docs/${api.id}/index.html" target="_blank" class="btn btn-primary" onclick="event.stopPropagation()">
-              View Docs
-            </a>
-            <a href="${api.github_url}" target="_blank" class="btn btn-secondary" onclick="event.stopPropagation()">
-              GitHub
-            </a>
-          </div>
-        `;
+                return `
+                  <tr>
+                    <td>
+                      <div class="api-name">${api.name || 'Unnamed API'}</div>
+                      <div class="api-description">${api.description || 'No description available'}</div>
+                    </td>
+                    <td>
+                      <div class="api-tags">${tags}</div>
+                    </td>
+                    <td>
+                      ${sourceBadge}
+                    </td>
+                    <td>
+                      <span style="color: var(--text-secondary); font-size: 0.875rem;">v${api.version || '1.0.0'}</span>
+                    </td>
+                    <td>
+                      <div class="api-actions">
+                        <a href="/api/apis/${api.id}/download" class="btn btn-primary" download>
+                          <img src="/bruno-logo.png" alt="Bruno" style="height: 14px; width: auto; vertical-align: middle; margin-right: 4px;">
+                          Bruno
+                        </a>
+                        <a href="/docs/${api.id}/index.html" class="btn btn-secondary" target="_blank">
+                          <span style="font-size: 14px; vertical-align: middle; margin-right: 4px;">📚</span>
+                          Docs
+                        </a>
+                        ${sourceUrl ? `
+                          <a href="${sourceUrl}" class="btn btn-secondary" target="_blank" rel="noopener">
+                            ${isGitHub ? `
+                              <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                              </svg>
+                            ` : `
+                              <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
+                                <path d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+                              </svg>
+                            `}
+                            ${sourceLabel}
+                          </a>
+                        ` : ''}
+                      </div>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
 
-        grid.appendChild(card);
+      content.innerHTML = tableHTML;
+    }
+
+    // Search functionality - use the filterApis function
+    document.getElementById('searchInput').addEventListener('input', filterApis);
+
+    // Sort and filter controls
+    document.getElementById('sortBy').addEventListener('change', filterApis);
+    document.getElementById('categoryFilter').addEventListener('change', function() {
+      activeFilter = this.value || null;
+
+      // Update filter tag UI
+      document.querySelectorAll('.filter-tag').forEach(el => {
+        el.classList.remove('active');
       });
 
-      content.innerHTML = '';
-      content.appendChild(grid);
-    }
-
-    // Search
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase();
-      const filtered = allApis.filter(api => 
-        api.name.toLowerCase().includes(query) ||
-        (api.description && api.description.toLowerCase().includes(query))
-      );
-      renderApis(filtered);
-    });
-
-    // Trigger scrape
-    async function triggerScrape() {
-      if (!confirm('This will search GitHub for OpenAPI files and process them. Continue?')) {
-        return;
-      }
-
-      try {
-        const res = await fetch('/api/scrape', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ minStars: 10, maxResults: 10 })
+      if (activeFilter) {
+        document.querySelectorAll('.filter-tag').forEach(el => {
+          if (el.textContent.startsWith(activeFilter)) {
+            el.classList.add('active');
+          }
         });
-        const data = await res.json();
-        alert(`Scrape started! Run ID: ${data.runId}\n\nCheck the server console for progress.`);
-      } catch (error) {
-        alert(`Error: ${error.message}`);
       }
-    }
+
+      filterApis();
+    });
 
     // Initialize
     loadStats();
     loadApis();
+    loadTags();
+
+    // Refresh stats every 30 seconds
+    setInterval(loadStats, 30000);
   </script>
 </body>
 </html>

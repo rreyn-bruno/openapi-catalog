@@ -6,6 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const CatalogDatabase = require('../database/schema');
 const GitHubScraper = require('../scraper/github-scraper');
 const ConversionPipeline = require('../pipeline/converter');
+const APIsGuruImporter = require('../scraper/apisguru-importer');
 
 class CatalogServer {
   constructor(options = {}) {
@@ -44,7 +45,7 @@ class CatalogServer {
       try {
         const { limit, offset, search, orderBy } = req.query;
         const apis = this.db.getAllApis({
-          limit: parseInt(limit) || 50,
+          limit: parseInt(limit) || 10000,
           offset: parseInt(offset) || 0,
           search: search || '',
           orderBy: orderBy || 'created_at DESC'
@@ -72,7 +73,7 @@ class CatalogServer {
         if (!api) {
           return res.status(404).json({ error: 'API not found' });
         }
-        
+
         const tags = this.db.getApiTags(api.id);
         res.json({ ...api, tags });
       } catch (error) {
@@ -80,11 +81,74 @@ class CatalogServer {
       }
     });
 
-    // Get all tags
+    // Download Bruno collection as ZIP
+    this.app.get('/api/apis/:id/download', (req, res) => {
+      try {
+        const api = this.db.getApi(req.params.id);
+        if (!api) {
+          return res.status(404).json({ error: 'API not found' });
+        }
+
+        if (!api.collection_path) {
+          return res.status(404).json({ error: 'Bruno collection not available for this API' });
+        }
+
+        const archiver = require('archiver');
+        const path = require('path');
+        const fs = require('fs');
+
+        const collectionPath = path.resolve(api.collection_path);
+
+        // Check if collection exists
+        if (!fs.existsSync(collectionPath)) {
+          return res.status(404).json({ error: 'Collection files not found' });
+        }
+
+        // Set headers for download
+        const filename = `${api.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_bruno_collection.zip`;
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+        // Create archive
+        const archive = archiver('zip', {
+          zlib: { level: 9 }
+        });
+
+        archive.on('error', (err) => {
+          console.error('Archive error:', err);
+          res.status(500).json({ error: 'Failed to create archive' });
+        });
+
+        // Pipe archive to response
+        archive.pipe(res);
+
+        // Add the collection directory to the archive
+        archive.directory(collectionPath, false);
+
+        // Finalize the archive
+        archive.finalize();
+
+      } catch (error) {
+        console.error('Download error:', error);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    // Get all tags with counts
     this.app.get('/api/tags', (req, res) => {
       try {
         const tags = this.db.getAllTags();
-        res.json({ tags });
+        // Add count for each tag
+        const tagsWithCounts = tags.map(tag => {
+          const stmt = this.db.db.prepare(`
+            SELECT COUNT(*) as count FROM api_tags WHERE tag_id = ?
+          `);
+          const count = stmt.get(tag.id).count;
+          return { ...tag, count };
+        });
+        // Sort by count descending
+        tagsWithCounts.sort((a, b) => b.count - a.count);
+        res.json(tagsWithCounts);
       } catch (error) {
         res.status(500).json({ error: error.message });
       }
@@ -145,6 +209,24 @@ class CatalogServer {
         res.status(500).json({ error: error.message });
       }
     });
+
+    // Import from APIs.guru
+    this.app.post('/api/import/apisguru', async (req, res) => {
+      try {
+        const { maxApis = null, skipExisting = true } = req.body;
+
+        res.json({
+          message: 'APIs.guru import started',
+          status: 'running'
+        });
+
+        // Run import in background
+        this.runAPIsGuruImport({ maxApis, skipExisting });
+
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
   }
 
   async runScrape(runId, options) {
@@ -177,15 +259,53 @@ class CatalogServer {
               docs_path: result.docs_path
             });
             
-            // Add tags (extract from OpenAPI spec if available)
-            if (api.spec?.tags) {
-              for (const tag of api.spec.tags) {
-                const tagId = uuidv4();
-                this.db.createTag(tagId, tag.name);
-                const dbTag = this.db.getTag(tag.name);
-                if (dbTag) {
-                  this.db.addTagToApi(api.id, dbTag.id);
-                }
+            // Add tags - use high-level categories based on API content
+            const tagsToAdd = new Set();
+            const name = (api.name || '').toLowerCase();
+            const desc = (api.description || '').toLowerCase();
+            const combined = `${name} ${desc}`;
+
+            // Define category keywords
+            const categories = {
+              'Payments': ['payment', 'stripe', 'paypal', 'billing', 'invoice', 'transaction', 'checkout'],
+              'Authentication': ['auth', 'oauth', 'login', 'sso', 'identity', 'jwt', 'token'],
+              'Database': ['database', 'sql', 'postgres', 'mysql', 'mongodb', 'redis', 'storage'],
+              'Cloud & Infrastructure': ['cloud', 'aws', 'azure', 'gcp', 'kubernetes', 'docker', 'infrastructure', 'terraform'],
+              'AI & ML': ['ai', 'ml', 'machine learning', 'llm', 'gpt', 'openai', 'model', 'neural'],
+              'Communication': ['chat', 'messaging', 'email', 'sms', 'notification', 'twilio', 'sendgrid'],
+              'Analytics': ['analytics', 'metrics', 'tracking', 'monitoring', 'observability', 'telemetry'],
+              'E-commerce': ['ecommerce', 'e-commerce', 'shop', 'cart', 'product', 'inventory'],
+              'Social Media': ['social', 'twitter', 'facebook', 'instagram', 'linkedin'],
+              'Developer Tools': ['api', 'sdk', 'cli', 'developer', 'webhook', 'rest', 'graphql'],
+              'Security': ['security', 'encryption', 'firewall', 'vulnerability', 'scan'],
+              'Media': ['video', 'audio', 'image', 'media', 'streaming', 'upload'],
+              'Documentation': ['docs', 'documentation', 'wiki', 'knowledge'],
+              'IoT': ['iot', 'sensor', 'device', 'hardware', 'embedded'],
+              'Finance': ['finance', 'banking', 'trading', 'stock', 'crypto', 'blockchain'],
+              'Healthcare': ['health', 'medical', 'patient', 'hospital', 'clinical'],
+              'Education': ['education', 'learning', 'course', 'student', 'school'],
+              'Gaming': ['game', 'gaming', 'player', 'unity', 'unreal']
+            };
+
+            // Match categories
+            for (const [category, keywords] of Object.entries(categories)) {
+              if (keywords.some(keyword => combined.includes(keyword))) {
+                tagsToAdd.add(category);
+              }
+            }
+
+            // If no categories matched, add a general one
+            if (tagsToAdd.size === 0) {
+              tagsToAdd.add('General');
+            }
+
+            // Save tags to database
+            for (const tagName of tagsToAdd) {
+              const tagId = uuidv4();
+              this.db.createTag(tagId, tagName);
+              const dbTag = this.db.getTag(tagName);
+              if (dbTag) {
+                this.db.addTagToApi(api.id, dbTag.id);
               }
             }
             
@@ -211,6 +331,40 @@ class CatalogServer {
         completed_at: new Date().toISOString(),
         status: 'failed'
       });
+    }
+  }
+
+  async runAPIsGuruImport(options = {}) {
+    try {
+      console.log('\n=== Starting APIs.guru import ===');
+
+      const importer = new APIsGuruImporter();
+      const pipeline = new ConversionPipeline();
+
+      const stats = await importer.importAll({
+        database: this.db,
+        processor: pipeline,
+        skipExisting: options.skipExisting !== false,
+        maxApis: options.maxApis,
+        delay: 1000 // 1 second delay between downloads
+      });
+
+      console.log('\n=== APIs.guru import completed ===');
+      console.log(`Total: ${stats.total}`);
+      console.log(`Downloaded: ${stats.downloaded}`);
+      console.log(`Processed: ${stats.processed}`);
+      console.log(`Skipped: ${stats.skipped}`);
+      console.log(`Failed: ${stats.failed}`);
+
+      if (stats.errors.length > 0) {
+        console.log('\nErrors:');
+        stats.errors.forEach(err => {
+          console.log(`  - ${err.api}: ${err.error}`);
+        });
+      }
+
+    } catch (error) {
+      console.error('APIs.guru import error:', error);
     }
   }
 

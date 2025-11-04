@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - Bruno API Catalog</title>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --bg-tertiary: #e9ecef;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6c757d;
+      --border: #dee2e6;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 2rem 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      transition: opacity 0.2s;
+    }
+
+    .back-link:hover {
+      opacity: 0.8;
+    }
+
+    .content-card {
+      background: var(--bg-primary);
+      border-radius: 16px;
+      padding: 3rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      height: 48px;
+      width: auto;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+    }
+
+    ul, ol {
+      margin-bottom: 1.5rem;
+      margin-left: 1.5rem;
+      color: var(--text-secondary);
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+      font-size: 1.05rem;
+    }
+
+    strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .highlight {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin-left: 0;
+    }
+
+    .feature-list li {
+      padding-left: 2rem;
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .feature-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-github {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .badge-apisguru {
+      background: #8b5cf6;
+      color: white;
+    }
+
+    code {
+      background: var(--bg-secondary);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 768px) {
+      .content-card {
+        padding: 2rem 1.5rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" class="back-link">
+      <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+      </svg>
+      Back to Catalog
+    </a>
+
+    <div class="content-card">
+      <h1>
+        About OpenAPI Catalog
+      </h1>
+
+      <p style="font-size: 1.15rem; color: var(--text-primary); margin-bottom: 2rem;">
+        The <span class="highlight">largest</span> OpenAPI-backed API catalog, automatically curated from GitHub and APIs.guru, with ready-to-use Bruno collections and interactive documentation.
+      </p>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalApis">~2,900</div>
+          <div class="stat-label">OpenAPI Specifications</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">2</div>
+          <div class="stat-label">Data Sources</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">100%</div>
+          <div class="stat-label">Bruno Compatible</div>
+        </div>
+      </div>
+
+      <h2>What is This?</h2>
+      <p>
+        OpenAPI Catalog is an automated service that discovers, converts, and catalogs public OpenAPI specifications from across the web. Every API in our catalog comes with:
+      </p>
+      <ul class="feature-list">
+        <li><strong>Bruno Collection</strong> - Ready to download and import into Bruno</li>
+        <li><strong>Interactive Documentation</strong> - Auto-generated HTML docs for easy exploration</li>
+        <li><strong>Source Information</strong> - Links to original GitHub repos or official sources</li>
+        <li><strong>Categorization</strong> - Organized by tags for easy discovery</li>
+      </ul>
+
+      <h2>Data Sources</h2>
+      <p>We aggregate OpenAPI specifications from two primary sources:</p>
+
+      <h3><span class="badge badge-github">GitHub</span> GitHub Scraper</h3>
+      <p>
+        Our custom scraper searches GitHub for public repositories containing OpenAPI specifications (<code>openapi.json</code>, <code>openapi.yaml</code>, <code>swagger.json</code>, etc.). This gives us:
+      </p>
+      <ul>
+        <li><strong>~400+ APIs</strong> from community projects and open-source tools</li>
+        <li><strong>Star counts</strong> as a quality signal</li>
+        <li><strong>Direct GitHub links</strong> to the source repositories</li>
+        <li><strong>Automatic categorization</strong> based on keywords and repo metadata</li>
+      </ul>
+
+      <h3><span class="badge badge-apisguru">APIs.guru</span> APIs.guru Import</h3>
+      <p>
+        We import the comprehensive <a href="https://apis.guru" target="_blank" style="color: var(--primary);">APIs.guru</a> catalog, which includes:
+      </p>
+      <ul>
+        <li><strong>~2,500+ APIs</strong> from 677+ providers</li>
+        <li><strong>Official APIs</strong> from AWS, Azure, Google Cloud, Stripe, Twilio, and more</li>
+        <li><strong>Well-maintained specs</strong> with regular updates</li>
+        <li><strong>Rich metadata</strong> including categories, logos, and provider information</li>
+      </ul>
+
+      <h2>How It Works</h2>
+      <ol>
+        <li><strong>Discovery</strong> - We continuously scan GitHub and sync with APIs.guru</li>
+        <li><strong>Download</strong> - OpenAPI specs are downloaded and validated</li>
+        <li><strong>Conversion</strong> - Each spec is converted to a Bruno collection using <code>bruno-doc-gen</code></li>
+        <li><strong>Documentation</strong> - Interactive HTML documentation is auto-generated</li>
+        <li><strong>Cataloging</strong> - APIs are tagged, categorized, and made searchable</li>
+      </ol>
+
+      <h2>Technology Stack</h2>
+      <ul>
+        <li><strong>Backend</strong> - Node.js + Express</li>
+        <li><strong>Database</strong> - SQLite (lightweight, fast, portable)</li>
+        <li><strong>Scraping</strong> - GitHub API via Octokit</li>
+        <li><strong>Conversion</strong> - bruno-doc-gen (OpenAPI → Bruno)</li>
+        <li><strong>Storage</strong> - File system for specs, collections, and docs</li>
+      </ul>
+
+      <h2>Why Bruno?</h2>
+      <p>
+        <a href="https://www.usebruno.com/" target="_blank" style="color: var(--primary);"><strong>Bruno</strong></a> is a fast, Git-friendly, open-source API client that stores collections directly in your filesystem. Unlike cloud-based alternatives, Bruno gives you:
+      </p>
+      <ul class="feature-list">
+        <li>Full control over your API collections</li>
+        <li>Git-based version control</li>
+        <li>Offline-first functionality</li>
+        <li>Privacy and security (no cloud sync required)</li>
+      </ul>
+
+      <h2>Get Started</h2>
+      <p>
+        Browse the catalog, find an API you're interested in, and click the <strong>Bruno</strong> button to download the collection as a ZIP file. Extract it and open it in Bruno to start making requests immediately!
+      </p>
+
+      <p style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 0.95rem;">
+        <strong>Note:</strong> This is an independent project and is not officially affiliated with Bruno or APIs.guru. All OpenAPI specifications are sourced from public repositories and catalogs.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Load stats
+    fetch('/api/stats')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('totalApis').textContent = data.totalApis.toLocaleString();
+      })
+      .catch(err => console.error('Error loading stats:', err));
+  </script>
+</body>
+</html>
+

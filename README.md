@@ -1,16 +1,32 @@
-# Bruno API Catalog
+# OpenAPI Catalog
 
-An automated service that discovers OpenAPI specifications from GitHub, converts them to Bruno collections, generates beautiful documentation, and provides a searchable catalog.
+The **largest** OpenAPI-backed API catalog, automatically curated from GitHub and APIs.guru, with ready-to-use Bruno collections and interactive documentation.
+
+🔗 **Live Site**: [Coming Soon - Add your domain here]
 
 ## Features
 
-- 🔍 **GitHub Scraper** - Automatically finds OpenAPI specs on GitHub
-- 🔄 **Auto Conversion** - Converts OpenAPI → Bruno collections → Documentation
-- 📚 **Beautiful Docs** - Generates static HTML documentation for each API
-- 🎨 **Web Catalog** - Browse and search APIs with a modern UI
-- 🏷️ **Tagging** - Organize APIs by tags
-- ⭐ **GitHub Integration** - Links to source repositories
-- 🚀 **Fetch in Bruno** - One-click import to Bruno client
+- 🌐 **~2,900+ APIs** - From GitHub and APIs.guru combined
+- 📦 **Bruno Collections** - Download ready-to-use collections for [Bruno API Client](https://www.usebruno.com/)
+- 📚 **Interactive Documentation** - Auto-generated HTML docs for every API
+- 🔍 **Search & Filter** - Find APIs by name, category, or source
+- 🏷️ **Smart Categorization** - Organized by tags with normalized naming
+- ⭐ **GitHub Integration** - Star counts and direct links to source repos
+- 🎨 **Modern UI** - Clean, responsive interface with purple gradient header
+
+## Data Sources
+
+### 🔵 GitHub Scraper
+- Searches GitHub for public OpenAPI specifications
+- Captures star counts as quality signals
+- Direct links to source repositories
+- ~400+ community APIs
+
+### 🟣 APIs.guru Import
+- Imports the comprehensive [APIs.guru](https://apis.guru) catalog
+- ~2,500+ official APIs from major providers (AWS, Azure, Google, Stripe, etc.)
+- Well-maintained specs with regular updates
+- Rich metadata including logos and categories
 
 ## Architecture
 

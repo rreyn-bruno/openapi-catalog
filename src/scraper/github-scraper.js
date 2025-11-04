@@ -17,7 +17,7 @@ class GitHubScraper {
   async searchOpenAPIFiles(options = {}) {
     const {
       minStars = 10,
-      maxResults = 100,
+      maxResults = 1000,
       filePatterns = ['openapi.json', 'openapi.yaml', 'openapi.yml', 'swagger.json']
     } = options;
 
@@ -26,23 +26,53 @@ class GitHubScraper {
     for (const pattern of filePatterns) {
       try {
         console.log(`Searching for ${pattern}...`);
-        
-        // Search for files
-        const searchResults = await this.octokit.search.code({
-          q: `filename:${pattern} stars:>=${minStars}`,
-          per_page: Math.min(maxResults, 100),
-          sort: 'indexed'
-        });
 
-        console.log(`Found ${searchResults.data.items.length} files matching ${pattern}`);
+        // GitHub API limits to 1000 results total (10 pages of 100)
+        const maxPages = Math.min(Math.ceil(maxResults / 100), 10);
 
-        for (const item of searchResults.data.items) {
+        for (let page = 1; page <= maxPages; page++) {
+          // Stop if we've reached maxResults
+          if (results.length >= maxResults) {
+            console.log(`Reached max results (${maxResults}), stopping...`);
+            break;
+          }
+
+          try {
+            // Search for files with pagination
+            const searchResults = await this.octokit.search.code({
+              q: `filename:${pattern}`,
+              per_page: 100,
+              page: page,
+              sort: 'indexed'
+            });
+
+            console.log(`Page ${page}: Found ${searchResults.data.items.length} files matching ${pattern}`);
+
+            // If no more results, break pagination
+            if (searchResults.data.items.length === 0) {
+              console.log(`No more results for ${pattern}, moving to next pattern`);
+              break;
+            }
+
+            for (const item of searchResults.data.items) {
+              // Stop if we've reached maxResults
+              if (results.length >= maxResults) {
+                console.log(`Reached max results (${maxResults}), stopping...`);
+                break;
+              }
+
           try {
             // Get repository info
             const repo = await this.octokit.repos.get({
               owner: item.repository.owner.login,
               repo: item.repository.name
             });
+
+            // Filter by stars AFTER getting repo info
+            if (repo.data.stargazers_count < minStars) {
+              console.log(`Skipping ${repo.data.full_name} (${repo.data.stargazers_count} stars < ${minStars})`);
+              continue;
+            }
 
             // Get file content
             const fileContent = await this.octokit.repos.getContent({
@@ -53,7 +83,7 @@ class GitHubScraper {
 
             // Decode content
             const content = Buffer.from(fileContent.data.content, 'base64').toString('utf-8');
-            
+
             // Try to parse as JSON or YAML
             let spec;
             try {
@@ -74,14 +104,29 @@ class GitHubScraper {
               file_path: item.path,
               repo_owner: item.repository.owner.login,
               repo_name: item.repository.name,
-              spec: spec
+              spec: spec,
+              source: 'github-scrape',
+              source_url: fileContent.data.download_url,
+              last_synced_at: new Date().toISOString()
             });
+
+            console.log(`✓ Added ${repo.data.full_name} (${repo.data.stargazers_count} stars)`);
 
             // Rate limiting - be nice to GitHub
             await this.sleep(1000);
           } catch (error) {
             console.error(`Error processing ${item.path}:`, error.message);
           }
+        }
+          } catch (error) {
+            console.error(`Error fetching page ${page} for ${pattern}:`, error.message);
+            break; // Stop pagination on error
+          }
+        }
+
+        // Stop searching other patterns if we've reached maxResults
+        if (results.length >= maxResults) {
+          break;
         }
       } catch (error) {
         console.error(`Error searching for ${pattern}:`, error.message);
@@ -114,7 +159,10 @@ class GitHubScraper {
         github_url: repoInfo.data.html_url,
         openapi_url: fileContent.data.download_url,
         stars: repoInfo.data.stargazers_count,
-        spec: spec
+        spec: spec,
+        source: 'github-scrape',
+        source_url: fileContent.data.download_url,
+        last_synced_at: new Date().toISOString()
       };
     } catch (error) {
       throw new Error(`Failed to get OpenAPI spec: ${error.message}`);

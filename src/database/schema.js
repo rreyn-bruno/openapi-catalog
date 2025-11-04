@@ -28,10 +28,30 @@ class CatalogDatabase {
         collection_path TEXT,
         docs_path TEXT,
         stars INTEGER DEFAULT 0,
+        source TEXT DEFAULT 'github-scrape',
+        source_url TEXT,
+        last_synced_at DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Add new columns to existing table if they don't exist
+    try {
+      this.db.exec(`ALTER TABLE apis ADD COLUMN source TEXT DEFAULT 'github-scrape'`);
+    } catch (e) {
+      // Column already exists, ignore
+    }
+    try {
+      this.db.exec(`ALTER TABLE apis ADD COLUMN source_url TEXT`);
+    } catch (e) {
+      // Column already exists, ignore
+    }
+    try {
+      this.db.exec(`ALTER TABLE apis ADD COLUMN last_synced_at DATETIME`);
+    } catch (e) {
+      // Column already exists, ignore
+    }
 
     // Tags table
     this.db.exec(`
@@ -75,8 +95,8 @@ class CatalogDatabase {
   // API operations
   createApi(api) {
     const stmt = this.db.prepare(`
-      INSERT INTO apis (id, name, description, version, github_url, openapi_url, collection_path, docs_path, stars)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO apis (id, name, description, version, github_url, openapi_url, collection_path, docs_path, stars, source, source_url, last_synced_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     return stmt.run(
       api.id,
@@ -87,7 +107,10 @@ class CatalogDatabase {
       api.openapi_url,
       api.collection_path,
       api.docs_path,
-      api.stars || 0
+      api.stars || 0,
+      api.source || 'github-scrape',
+      api.source_url || null,
+      api.last_synced_at || new Date().toISOString()
     );
   }
 
@@ -138,6 +161,21 @@ class CatalogDatabase {
   getTag(name) {
     const stmt = this.db.prepare('SELECT * FROM tags WHERE name = ?');
     return stmt.get(name);
+  }
+
+  getOrCreateTag(name) {
+    // Try to get existing tag
+    let tag = this.getTag(name);
+
+    // If it doesn't exist, create it
+    if (!tag) {
+      const { v4: uuidv4 } = require('uuid');
+      const id = uuidv4();
+      this.createTag(id, name);
+      tag = { id, name };
+    }
+
+    return tag;
   }
 
   getAllTags() {
