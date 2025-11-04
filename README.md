@@ -2,7 +2,7 @@
 
 The **largest** OpenAPI-backed API catalog, automatically curated from GitHub and APIs.guru, with ready-to-use Bruno collections and interactive documentation.
 
-🔗 **Live Site**: [Coming Soon - Add your domain here]
+🔗 **Live Site**: [Deploying on Railway]
 
 ## Features
 

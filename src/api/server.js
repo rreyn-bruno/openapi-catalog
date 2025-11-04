@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
 const CatalogDatabase = require('../database/schema');
@@ -14,9 +15,28 @@ class CatalogServer {
     this.port = options.port || 5000;
     this.db = new CatalogDatabase(options.dbPath);
     this.githubToken = options.githubToken;
-    
+
+    // Ensure data directories exist
+    this.ensureDataDirectories();
+
     this.setupMiddleware();
     this.setupRoutes();
+  }
+
+  ensureDataDirectories() {
+    const directories = [
+      path.join(__dirname, '../../data'),
+      path.join(__dirname, '../../data/openapi'),
+      path.join(__dirname, '../../data/collections'),
+      path.join(__dirname, '../../data/docs')
+    ];
+
+    directories.forEach(dir => {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+        console.log(`✓ Created directory: ${dir}`);
+      }
+    });
   }
 
   setupMiddleware() {
