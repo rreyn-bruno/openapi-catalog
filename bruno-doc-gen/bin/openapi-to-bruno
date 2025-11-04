@@ -1,0 +1,63 @@
+#!/usr/bin/env node
+
+const { Command } = require('commander');
+const { convertOpenApiToFileStructure } = require('../src/openapi-converter');
+const path = require('path');
+const fs = require('fs-extra');
+
+const program = new Command();
+
+program
+  .name('openapi-to-bruno')
+  .description('Convert OpenAPI specifications to Bruno collection file structure')
+  .version('0.1.0')
+  .argument('<input>', 'OpenAPI spec file path or URL (JSON or YAML)')
+  .argument('[output]', 'Output directory for Bruno collection', './bruno-collection')
+  .option('-v, --verbose', 'Enable verbose logging')
+  .option('-f, --force', 'Overwrite output directory if it exists')
+  .action(async (input, output, options) => {
+    try {
+      // Resolve output path
+      const outputPath = path.resolve(process.cwd(), output);
+
+      // Check if output directory exists
+      const outputExists = await fs.pathExists(outputPath);
+      if (outputExists && !options.force) {
+        console.error(`\n❌ Error: Output directory already exists: ${outputPath}`);
+        console.error('Use --force to overwrite, or choose a different output directory.\n');
+        process.exit(1);
+      }
+
+      // If force flag is set, remove existing directory
+      if (outputExists && options.force) {
+        console.log(`🗑️  Removing existing directory: ${outputPath}\n`);
+        await fs.remove(outputPath);
+      }
+
+      // Convert OpenAPI to Bruno
+      const result = await convertOpenApiToFileStructure(input, outputPath, {
+        verbose: options.verbose
+      });
+
+      // Print summary
+      console.log('\n📊 Summary:');
+      console.log(`   Collection: ${result.collectionName}`);
+      console.log(`   Requests/Folders: ${result.itemCount}`);
+      console.log(`   Environments: ${result.environmentCount}`);
+      console.log(`   Output: ${result.outputPath}`);
+      console.log('\n💡 Next steps:');
+      console.log(`   1. Open the collection in Bruno: bruno ${result.outputPath}`);
+      console.log(`   2. Generate documentation: bruno-docs generate ${result.outputPath}`);
+      console.log('');
+
+    } catch (error) {
+      console.error(`\n❌ Error: ${error.message}\n`);
+      if (options.verbose) {
+        console.error(error.stack);
+      }
+      process.exit(1);
+    }
+  });
+
+program.parse();
+

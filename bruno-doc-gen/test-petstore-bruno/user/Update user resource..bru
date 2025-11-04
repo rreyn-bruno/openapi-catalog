@@ -1,0 +1,28 @@
+meta {
+  name: Update user resource.
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/user/:username
+  body: json
+  auth: inherit
+}
+
+params:path {
+  username: 
+}
+
+body:json {
+  {
+    "id": 0,
+    "username": "",
+    "firstName": "",
+    "lastName": "",
+    "email": "",
+    "password": "",
+    "phone": "",
+    "userStatus": 0
+  }
+}

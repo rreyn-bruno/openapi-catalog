@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Working with JSON</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <nav id="sidebar" class="sidebar-wrapper">
+            <div class="sidebar-content">
+                <div class="sidebar-item sidebar-brand">Working with JSON</div>
+                <div class="sidebar-item sidebar-menu">
+                    <div id="tree"></div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="page-content">
+            <div class="container-fluid">
+                <div class="row d-flex align-items-center p-3 border-bottom">
+                    <div class="col-md-1">
+                        <a id="toggle-sidebar" class="btn rounded-0 p-3" href="#">
+                            <i class="fas fa-bars"></i>
+                        </a>
+                    </div>
+                    <div class="col-md-9">
+                        <h5 class="mb-0">Working with JSON</h5>
+                    </div>
+                    <div class="col-md-2 text-right">
+                        <!-- Fetch in Bruno Button -->
+                        <div class="bruno-fetch-button" data-bruno-collection-url="https://github.com/rreyn-bruno/brunomonorepo.git"></div>
+                    </div>
+                </div>
+
+                <div class="row p-lg-4">
+                    <article class="main-content col-md-12" id="doc-body">
+
+                        <div class="row row-no-padding row-eq-height">
+                            <div class="col-md-6 section">
+                                <div class="api-information" id="enumerate--key---value--object-properties">
+                                    <div class="heading">
+                                        <div class="name">
+                                            <span class="POST method">POST</span>
+                                            Enumerate (Key + value) object properties
+                                        </div>
+                                    </div>
+
+                                    <div class="url">{{baseUrl}}</div>
+
+
+
+
+                                    <div class="request-body">
+                                        <div class="body-heading">BODY <span class="body-type">json</span></div>
+                                        <hr>
+                                        <div class="raw-body">
+                                            <pre><code>{
+  &quot;items&quot;: [
+    {
+      &quot;orderID&quot;: &quot;0000001211&quot;,
+      &quot;orderInvoiceNo&quot;: &quot;1234567&quot;,
+      &quot;OrderBlocks&quot;: [
+        {
+          &quot;onlLineId&quot;: 1,
+          &quot;onlProductCode&quot;: &quot;001&quot;   
+        },
+        {
+          &quot;onlLineId&quot;: 2,
+          &quot;onlProductCode&quot;: &quot;012&quot;   
+        },{
+          &quot;onlLineId&quot;: 3,
+          &quot;onlProductCode&quot;: &quot;013&quot;   
+        },{
+          &quot;onlLineId&quot;: 4,
+          &quot;onlProductCode&quot;: &quot;014&quot;   
+        }
+      ]
+    }
+  ]
+}</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 examples">
+                                <div class="sample-request">
+                                    <div class="heading">
+                                        <span>Code Examples</span>
+                                    </div>
+                                    <div class="language-selector">
+                                        <select class="lang-dropdown" data-request-id="enumerate--key---value--object-properties">
+                                            <option value="c_libcurl">C</option>
+                                            <option value="clojure_clj_http">Clojure</option>
+                                            <option value="crystal_native">Crystal</option>
+                                            <option value="csharp_httpclient">C# - HttpClient</option>
+                                            <option value="csharp_restsharp">C# - RestSharp</option>
+                                            <option value="go_native">Go</option>
+                                            <option value="http_http1.1">HTTP</option>
+                                            <option value="java_asynchttp">Java - AsyncHttp</option>
+                                            <option value="java_nethttp">Java - java.net.http</option>
+                                            <option value="java_okhttp">Java - OkHttp</option>
+                                            <option value="java_unirest">Java - Unirest</option>
+                                            <option value="javascript_xhr">JavaScript - XMLHttpRequest</option>
+                                            <option value="javascript_axios">JavaScript - Axios</option>
+                                            <option value="javascript_fetch">JavaScript - fetch</option>
+                                            <option value="javascript_jquery">JavaScript - jQuery</option>
+                                            <option value="kotlin_okhttp">Kotlin</option>
+                                            <option value="node_native">Node.js - HTTP</option>
+                                            <option value="node_request">Node.js - Request</option>
+                                            <option value="node_unirest">Node.js - Unirest</option>
+                                            <option value="node_axios">Node.js - Axios</option>
+                                            <option value="node_fetch">Node.js - Fetch</option>
+                                            <option value="objc_nsurlsession">Objective-C</option>
+                                            <option value="ocaml_cohttp">OCaml</option>
+                                            <option value="php_curl">PHP - cURL</option>
+                                            <option value="php_guzzle">PHP - Guzzle</option>
+                                            <option value="php_http1">PHP - HTTP v1</option>
+                                            <option value="php_http2">PHP - HTTP v2</option>
+                                            <option value="powershell_webrequest">Powershell - Invoke-WebRequest</option>
+                                            <option value="powershell_restmethod">Powershell - Invoke-RestMethod</option>
+                                            <option value="python_python3">Python - http.client</option>
+                                            <option value="python_requests">Python - Requests</option>
+                                            <option value="r_httr">R</option>
+                                            <option value="ruby_native">Ruby - net::http</option>
+                                            <option value="ruby_faraday">Ruby - faraday</option>
+                                            <option value="rust_reqwest">Rust</option>
+                                            <option value="shell_curl">Shell - cURL</option>
+                                            <option value="shell_httpie">Shell - HTTPie</option>
+                                            <option value="shell_wget">Shell - Wget</option>
+                                            <option value="swift_nsurlsession">Swift</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="code-samples" data-request-id="enumerate--key---value--object-properties">
+                                    <div class="code-sample active" data-lang="c_libcurl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="clojure_clj_http">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="crystal_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_httpclient">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_restsharp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="go_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="http_http1.1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_asynchttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_nethttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_xhr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_jquery">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="kotlin_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_request">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="objc_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ocaml_cohttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_guzzle">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http2">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_webrequest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_restmethod">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_python3">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_requests">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="r_httr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_faraday">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="rust_reqwest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_httpie">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_wget">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="swift_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row row-no-padding row-eq-height">
+                            <div class="col-md-6 section">
+                                <div class="api-information" id="get-key-by-value-in-object">
+                                    <div class="heading">
+                                        <div class="name">
+                                            <span class="POST method">POST</span>
+                                            Get key by value in object
+                                        </div>
+                                    </div>
+
+                                    <div class="url">{{baseUrl}}</div>
+
+
+
+
+                                    <div class="request-body">
+                                        <div class="body-heading">BODY <span class="body-type">json</span></div>
+                                        <hr>
+                                        <div class="raw-body">
+                                            <pre><code>{
+  &quot;items&quot;: [
+    {
+      &quot;orderID&quot;: &quot;0000001211&quot;,
+      &quot;orderInvoiceNo&quot;: &quot;1234567&quot;,
+      &quot;OrderBlocks&quot;: [
+        {
+          &quot;onlLineId&quot;: [1,3,4,5],
+          &quot;randomCodeviHash&quot;: &quot;001&quot;   
+        },
+        {
+          &quot;onlLineId&quot;: [0,6,2,5],
+          &quot;randomCodevisecHash&quot;: &quot;012&quot;   
+        }
+      ]
+    }
+  ]
+}</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 examples">
+                                <div class="sample-request">
+                                    <div class="heading">
+                                        <span>Code Examples</span>
+                                    </div>
+                                    <div class="language-selector">
+                                        <select class="lang-dropdown" data-request-id="get-key-by-value-in-object">
+                                            <option value="c_libcurl">C</option>
+                                            <option value="clojure_clj_http">Clojure</option>
+                                            <option value="crystal_native">Crystal</option>
+                                            <option value="csharp_httpclient">C# - HttpClient</option>
+                                            <option value="csharp_restsharp">C# - RestSharp</option>
+                                            <option value="go_native">Go</option>
+                                            <option value="http_http1.1">HTTP</option>
+                                            <option value="java_asynchttp">Java - AsyncHttp</option>
+                                            <option value="java_nethttp">Java - java.net.http</option>
+                                            <option value="java_okhttp">Java - OkHttp</option>
+                                            <option value="java_unirest">Java - Unirest</option>
+                                            <option value="javascript_xhr">JavaScript - XMLHttpRequest</option>
+                                            <option value="javascript_axios">JavaScript - Axios</option>
+                                            <option value="javascript_fetch">JavaScript - fetch</option>
+                                            <option value="javascript_jquery">JavaScript - jQuery</option>
+                                            <option value="kotlin_okhttp">Kotlin</option>
+                                            <option value="node_native">Node.js - HTTP</option>
+                                            <option value="node_request">Node.js - Request</option>
+                                            <option value="node_unirest">Node.js - Unirest</option>
+                                            <option value="node_axios">Node.js - Axios</option>
+                                            <option value="node_fetch">Node.js - Fetch</option>
+                                            <option value="objc_nsurlsession">Objective-C</option>
+                                            <option value="ocaml_cohttp">OCaml</option>
+                                            <option value="php_curl">PHP - cURL</option>
+                                            <option value="php_guzzle">PHP - Guzzle</option>
+                                            <option value="php_http1">PHP - HTTP v1</option>
+                                            <option value="php_http2">PHP - HTTP v2</option>
+                                            <option value="powershell_webrequest">Powershell - Invoke-WebRequest</option>
+                                            <option value="powershell_restmethod">Powershell - Invoke-RestMethod</option>
+                                            <option value="python_python3">Python - http.client</option>
+                                            <option value="python_requests">Python - Requests</option>
+                                            <option value="r_httr">R</option>
+                                            <option value="ruby_native">Ruby - net::http</option>
+                                            <option value="ruby_faraday">Ruby - faraday</option>
+                                            <option value="rust_reqwest">Rust</option>
+                                            <option value="shell_curl">Shell - cURL</option>
+                                            <option value="shell_httpie">Shell - HTTPie</option>
+                                            <option value="shell_wget">Shell - Wget</option>
+                                            <option value="swift_nsurlsession">Swift</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="code-samples" data-request-id="get-key-by-value-in-object">
+                                    <div class="code-sample active" data-lang="c_libcurl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="clojure_clj_http">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="crystal_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_httpclient">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_restsharp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="go_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="http_http1.1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_asynchttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_nethttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_xhr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_jquery">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="kotlin_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_request">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="objc_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ocaml_cohttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_guzzle">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http2">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_webrequest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_restmethod">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_python3">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_requests">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="r_httr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_faraday">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="rust_reqwest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_httpie">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_wget">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="swift_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row row-no-padding row-eq-height">
+                            <div class="col-md-6 section">
+                                <div class="api-information" id="get-object-keys">
+                                    <div class="heading">
+                                        <div class="name">
+                                            <span class="POST method">POST</span>
+                                            Get object keys
+                                        </div>
+                                    </div>
+
+                                    <div class="url">{{baseUrl}}</div>
+
+
+
+                                    <div class="request-body">
+                                        <div class="body-heading">QUERY PARAMS</div>
+                                        <hr>
+                                        <div class="param row">
+                                            <div class="name col-md-3"></div>
+                                            <div class="value col-md-9"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="request-body">
+                                        <div class="body-heading">BODY <span class="body-type">json</span></div>
+                                        <hr>
+                                        <div class="raw-body">
+                                            <pre><code>{
+  &quot;items&quot;: [
+    {
+      &quot;orderID&quot;: &quot;0000001211&quot;,
+      &quot;orderInvoiceNo&quot;: &quot;1234567&quot;,
+      &quot;OrderBlocks&quot;: [
+        {
+          &quot;onlLineId&quot;: 1,
+          &quot;onlProductCode&quot;: &quot;001&quot;   
+        },
+        {
+          &quot;onlLineId&quot;: 2,
+          &quot;onlProductCode&quot;: &quot;012&quot;   
+        },{
+          &quot;onlLineId&quot;: 3,
+          &quot;onlProductCode&quot;: &quot;013&quot;   
+        },{
+          &quot;onlLineId&quot;: 4,
+          &quot;onlProductCode&quot;: &quot;014&quot;   
+        }
+      ]
+    }
+  ]
+}</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 examples">
+                                <div class="sample-request">
+                                    <div class="heading">
+                                        <span>Code Examples</span>
+                                    </div>
+                                    <div class="language-selector">
+                                        <select class="lang-dropdown" data-request-id="get-object-keys">
+                                            <option value="c_libcurl">C</option>
+                                            <option value="clojure_clj_http">Clojure</option>
+                                            <option value="crystal_native">Crystal</option>
+                                            <option value="csharp_httpclient">C# - HttpClient</option>
+                                            <option value="csharp_restsharp">C# - RestSharp</option>
+                                            <option value="go_native">Go</option>
+                                            <option value="http_http1.1">HTTP</option>
+                                            <option value="java_asynchttp">Java - AsyncHttp</option>
+                                            <option value="java_nethttp">Java - java.net.http</option>
+                                            <option value="java_okhttp">Java - OkHttp</option>
+                                            <option value="java_unirest">Java - Unirest</option>
+                                            <option value="javascript_xhr">JavaScript - XMLHttpRequest</option>
+                                            <option value="javascript_axios">JavaScript - Axios</option>
+                                            <option value="javascript_fetch">JavaScript - fetch</option>
+                                            <option value="javascript_jquery">JavaScript - jQuery</option>
+                                            <option value="kotlin_okhttp">Kotlin</option>
+                                            <option value="node_native">Node.js - HTTP</option>
+                                            <option value="node_request">Node.js - Request</option>
+                                            <option value="node_unirest">Node.js - Unirest</option>
+                                            <option value="node_axios">Node.js - Axios</option>
+                                            <option value="node_fetch">Node.js - Fetch</option>
+                                            <option value="objc_nsurlsession">Objective-C</option>
+                                            <option value="ocaml_cohttp">OCaml</option>
+                                            <option value="php_curl">PHP - cURL</option>
+                                            <option value="php_guzzle">PHP - Guzzle</option>
+                                            <option value="php_http1">PHP - HTTP v1</option>
+                                            <option value="php_http2">PHP - HTTP v2</option>
+                                            <option value="powershell_webrequest">Powershell - Invoke-WebRequest</option>
+                                            <option value="powershell_restmethod">Powershell - Invoke-RestMethod</option>
+                                            <option value="python_python3">Python - http.client</option>
+                                            <option value="python_requests">Python - Requests</option>
+                                            <option value="r_httr">R</option>
+                                            <option value="ruby_native">Ruby - net::http</option>
+                                            <option value="ruby_faraday">Ruby - faraday</option>
+                                            <option value="rust_reqwest">Rust</option>
+                                            <option value="shell_curl">Shell - cURL</option>
+                                            <option value="shell_httpie">Shell - HTTPie</option>
+                                            <option value="shell_wget">Shell - Wget</option>
+                                            <option value="swift_nsurlsession">Swift</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="code-samples" data-request-id="get-object-keys">
+                                    <div class="code-sample active" data-lang="c_libcurl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="clojure_clj_http">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="crystal_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_httpclient">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_restsharp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="go_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="http_http1.1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_asynchttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_nethttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_xhr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_jquery">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="kotlin_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_request">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="objc_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ocaml_cohttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_guzzle">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http2">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_webrequest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_restmethod">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_python3">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_requests">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="r_httr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_faraday">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="rust_reqwest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_httpie">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_wget">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="swift_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row row-no-padding row-eq-height">
+                            <div class="col-md-6 section">
+                                <div class="api-information" id="get-object-values">
+                                    <div class="heading">
+                                        <div class="name">
+                                            <span class="POST method">POST</span>
+                                            Get object values
+                                        </div>
+                                    </div>
+
+                                    <div class="url">{{baseUrl}}</div>
+
+
+
+
+                                    <div class="request-body">
+                                        <div class="body-heading">BODY <span class="body-type">json</span></div>
+                                        <hr>
+                                        <div class="raw-body">
+                                            <pre><code>{
+  &quot;items&quot;: [
+    {
+      &quot;orderID&quot;: &quot;0000001211&quot;,
+      &quot;orderInvoiceNo&quot;: &quot;1234567&quot;,
+      &quot;OrderBlocks&quot;: [
+        {
+          &quot;onlLineId&quot;: 1,
+          &quot;onlProductCode&quot;: &quot;001&quot;   
+        },
+        {
+          &quot;onlLineId&quot;: 2,
+          &quot;onlProductCode&quot;: &quot;012&quot;   
+        },{
+          &quot;onlLineId&quot;: 3,
+          &quot;onlProductCode&quot;: &quot;013&quot;   
+        },{
+          &quot;onlLineId&quot;: 4,
+          &quot;onlProductCode&quot;: &quot;014&quot;   
+        }
+      ]
+    }
+  ]
+}</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 examples">
+                                <div class="sample-request">
+                                    <div class="heading">
+                                        <span>Code Examples</span>
+                                    </div>
+                                    <div class="language-selector">
+                                        <select class="lang-dropdown" data-request-id="get-object-values">
+                                            <option value="c_libcurl">C</option>
+                                            <option value="clojure_clj_http">Clojure</option>
+                                            <option value="crystal_native">Crystal</option>
+                                            <option value="csharp_httpclient">C# - HttpClient</option>
+                                            <option value="csharp_restsharp">C# - RestSharp</option>
+                                            <option value="go_native">Go</option>
+                                            <option value="http_http1.1">HTTP</option>
+                                            <option value="java_asynchttp">Java - AsyncHttp</option>
+                                            <option value="java_nethttp">Java - java.net.http</option>
+                                            <option value="java_okhttp">Java - OkHttp</option>
+                                            <option value="java_unirest">Java - Unirest</option>
+                                            <option value="javascript_xhr">JavaScript - XMLHttpRequest</option>
+                                            <option value="javascript_axios">JavaScript - Axios</option>
+                                            <option value="javascript_fetch">JavaScript - fetch</option>
+                                            <option value="javascript_jquery">JavaScript - jQuery</option>
+                                            <option value="kotlin_okhttp">Kotlin</option>
+                                            <option value="node_native">Node.js - HTTP</option>
+                                            <option value="node_request">Node.js - Request</option>
+                                            <option value="node_unirest">Node.js - Unirest</option>
+                                            <option value="node_axios">Node.js - Axios</option>
+                                            <option value="node_fetch">Node.js - Fetch</option>
+                                            <option value="objc_nsurlsession">Objective-C</option>
+                                            <option value="ocaml_cohttp">OCaml</option>
+                                            <option value="php_curl">PHP - cURL</option>
+                                            <option value="php_guzzle">PHP - Guzzle</option>
+                                            <option value="php_http1">PHP - HTTP v1</option>
+                                            <option value="php_http2">PHP - HTTP v2</option>
+                                            <option value="powershell_webrequest">Powershell - Invoke-WebRequest</option>
+                                            <option value="powershell_restmethod">Powershell - Invoke-RestMethod</option>
+                                            <option value="python_python3">Python - http.client</option>
+                                            <option value="python_requests">Python - Requests</option>
+                                            <option value="r_httr">R</option>
+                                            <option value="ruby_native">Ruby - net::http</option>
+                                            <option value="ruby_faraday">Ruby - faraday</option>
+                                            <option value="rust_reqwest">Rust</option>
+                                            <option value="shell_curl">Shell - cURL</option>
+                                            <option value="shell_httpie">Shell - HTTPie</option>
+                                            <option value="shell_wget">Shell - Wget</option>
+                                            <option value="swift_nsurlsession">Swift</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="code-samples" data-request-id="get-object-values">
+                                    <div class="code-sample active" data-lang="c_libcurl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="clojure_clj_http">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="crystal_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_httpclient">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_restsharp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="go_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="http_http1.1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_asynchttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_nethttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_xhr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_jquery">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="kotlin_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_request">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="objc_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ocaml_cohttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_guzzle">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http2">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_webrequest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_restmethod">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_python3">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_requests">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="r_httr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_faraday">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="rust_reqwest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_httpie">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_wget">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="swift_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row row-no-padding row-eq-height">
+                            <div class="col-md-6 section">
+                                <div class="api-information" id="test">
+                                    <div class="heading">
+                                        <div class="name">
+                                            <span class="POST method">POST</span>
+                                            test
+                                        </div>
+                                    </div>
+
+                                    <div class="url">https://echo.usebruno.com/</div>
+
+
+
+
+                                    <div class="request-body">
+                                        <div class="body-heading">BODY <span class="body-type">json</span></div>
+                                        <hr>
+                                        <div class="raw-body">
+                                            <pre><code>{
+  &quot;id&quot;: &quot;usr_918273&quot;,
+  &quot;name&quot;: &quot;Ava Thompson&quot;,
+  &quot;email&quot;: &quot;ava.thompson@example.com&quot;,
+  &quot;age&quot;: 29,
+  &quot;role&quot;: &quot;product_manager&quot;,
+  &quot;is_active&quot;: true,
+  &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,
+  &quot;preferences&quot;: {
+    &quot;language&quot;: &quot;en&quot;,
+    &quot;timezone&quot;: &quot;America/New_York&quot;,
+    &quot;notifications&quot;: {
+      &quot;email&quot;: true,
+      &quot;sms&quot;: false,
+      &quot;push&quot;: true
+    }
+  },
+  &quot;tags&quot;: [&quot;beta_user&quot;, &quot;early_adopter&quot;]
+}
+</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 examples">
+                                <div class="sample-request">
+                                    <div class="heading">
+                                        <span>Code Examples</span>
+                                    </div>
+                                    <div class="language-selector">
+                                        <select class="lang-dropdown" data-request-id="test">
+                                            <option value="c_libcurl">C</option>
+                                            <option value="clojure_clj_http">Clojure</option>
+                                            <option value="crystal_native">Crystal</option>
+                                            <option value="csharp_httpclient">C# - HttpClient</option>
+                                            <option value="csharp_restsharp">C# - RestSharp</option>
+                                            <option value="go_native">Go</option>
+                                            <option value="http_http1.1">HTTP</option>
+                                            <option value="java_asynchttp">Java - AsyncHttp</option>
+                                            <option value="java_nethttp">Java - java.net.http</option>
+                                            <option value="java_okhttp">Java - OkHttp</option>
+                                            <option value="java_unirest">Java - Unirest</option>
+                                            <option value="javascript_xhr">JavaScript - XMLHttpRequest</option>
+                                            <option value="javascript_axios">JavaScript - Axios</option>
+                                            <option value="javascript_fetch">JavaScript - fetch</option>
+                                            <option value="javascript_jquery">JavaScript - jQuery</option>
+                                            <option value="kotlin_okhttp">Kotlin</option>
+                                            <option value="node_native">Node.js - HTTP</option>
+                                            <option value="node_request">Node.js - Request</option>
+                                            <option value="node_unirest">Node.js - Unirest</option>
+                                            <option value="node_axios">Node.js - Axios</option>
+                                            <option value="node_fetch">Node.js - Fetch</option>
+                                            <option value="objc_nsurlsession">Objective-C</option>
+                                            <option value="ocaml_cohttp">OCaml</option>
+                                            <option value="php_curl">PHP - cURL</option>
+                                            <option value="php_guzzle">PHP - Guzzle</option>
+                                            <option value="php_http1">PHP - HTTP v1</option>
+                                            <option value="php_http2">PHP - HTTP v2</option>
+                                            <option value="powershell_webrequest">Powershell - Invoke-WebRequest</option>
+                                            <option value="powershell_restmethod">Powershell - Invoke-RestMethod</option>
+                                            <option value="python_python3">Python - http.client</option>
+                                            <option value="python_requests">Python - Requests</option>
+                                            <option value="r_httr">R</option>
+                                            <option value="ruby_native">Ruby - net::http</option>
+                                            <option value="ruby_faraday">Ruby - faraday</option>
+                                            <option value="rust_reqwest">Rust</option>
+                                            <option value="shell_curl">Shell - cURL</option>
+                                            <option value="shell_httpie">Shell - HTTPie</option>
+                                            <option value="shell_wget">Shell - Wget</option>
+                                            <option value="swift_nsurlsession">Swift</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="code-samples" data-request-id="test">
+                                    <div class="code-sample active" data-lang="c_libcurl">
+                                        <pre><code>CURL *hnd &#x3D; curl_easy_init();
+
+curl_easy_setopt(hnd, CURLOPT_CUSTOMREQUEST, &quot;POST&quot;);
+curl_easy_setopt(hnd, CURLOPT_URL, &quot;https://echo.usebruno.com/&quot;);
+
+struct curl_slist *headers &#x3D; NULL;
+headers &#x3D; curl_slist_append(headers, &quot;content-type: application/json&quot;);
+curl_easy_setopt(hnd, CURLOPT_HTTPHEADER, headers);
+
+curl_easy_setopt(hnd, CURLOPT_POSTFIELDS, &quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;);
+
+CURLcode ret &#x3D; curl_easy_perform(hnd);</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="clojure_clj_http">
+                                        <pre><code>(require &#x27;[clj-http.client :as client])
+
+(client/post &quot;https://echo.usebruno.com/&quot; {:content-type :json
+                                           :form-params {:id &quot;usr_918273&quot;
+                                                         :name &quot;Ava Thompson&quot;
+                                                         :email &quot;ava.thompson@example.com&quot;
+                                                         :age 29
+                                                         :role &quot;product_manager&quot;
+                                                         :is_active true
+                                                         :created_at &quot;2025-10-22T14:35:00Z&quot;
+                                                         :preferences {:language &quot;en&quot;
+                                                                       :timezone &quot;America/New_York&quot;
+                                                                       :notifications {:email true
+                                                                                       :sms false
+                                                                                       :push true}}
+                                                         :tags [&quot;beta_user&quot; &quot;early_adopter&quot;]}})</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="crystal_native">
+                                        <pre><code>require &quot;http/client&quot;
+
+url &#x3D; &quot;https://echo.usebruno.com/&quot;
+headers &#x3D; HTTP::Headers{
+  &quot;content-type&quot; &#x3D;&gt; &quot;application/json&quot;
+}
+reqBody &#x3D; &quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;
+
+response &#x3D; HTTP::Client.post url, headers: headers, body: reqBody
+puts response.body</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_httpclient">
+                                        <pre><code>using System.Net.Http.Headers;
+var client &#x3D; new HttpClient();
+var request &#x3D; new HttpRequestMessage
+{
+    Method &#x3D; HttpMethod.Post,
+    RequestUri &#x3D; new Uri(&quot;https://echo.usebruno.com/&quot;),
+    Content &#x3D; new StringContent(&quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;)
+    {
+        Headers &#x3D;
+        {
+            ContentType &#x3D; new MediaTypeHeaderValue(&quot;application/json&quot;)
+        }
+    }
+};
+using (var response &#x3D; await client.SendAsync(request))
+{
+    response.EnsureSuccessStatusCode();
+    var body &#x3D; await response.Content.ReadAsStringAsync();
+    Console.WriteLine(body);
+}</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_restsharp">
+                                        <pre><code>var client &#x3D; new RestClient(&quot;https://echo.usebruno.com/&quot;);
+var request &#x3D; new RestRequest(&quot;&quot;, Method.Post);
+request.AddHeader(&quot;content-type&quot;, &quot;application/json&quot;);
+request.AddParameter(&quot;application/json&quot;, &quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;, ParameterType.RequestBody);
+var response &#x3D; client.Execute(request);</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="go_native">
+                                        <pre><code>package main
+
+import (
+	&quot;fmt&quot;
+	&quot;strings&quot;
+	&quot;net/http&quot;
+	&quot;io&quot;
+)
+
+func main() {
+
+	url :&#x3D; &quot;https://echo.usebruno.com/&quot;
+
+	payload :&#x3D; strings.NewReader(&quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;)
+
+	req, _ :&#x3D; http.NewRequest(&quot;POST&quot;, url, payload)
+
+	req.Header.Add(&quot;content-type&quot;, &quot;application/json&quot;)
+
+	res, _ :&#x3D; http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ :&#x3D; io.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
+}</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="http_http1.1">
+                                        <pre><code>POST / HTTP/1.1
+Content-Type: application/json
+Host: echo.usebruno.com
+Content-Length: 406
+
+{
+  &quot;id&quot;: &quot;usr_918273&quot;,
+  &quot;name&quot;: &quot;Ava Thompson&quot;,
+  &quot;email&quot;: &quot;ava.thompson@example.com&quot;,
+  &quot;age&quot;: 29,
+  &quot;role&quot;: &quot;product_manager&quot;,
+  &quot;is_active&quot;: true,
+  &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,
+  &quot;preferences&quot;: {
+    &quot;language&quot;: &quot;en&quot;,
+    &quot;timezone&quot;: &quot;America/New_York&quot;,
+    &quot;notifications&quot;: {
+      &quot;email&quot;: true,
+      &quot;sms&quot;: false,
+      &quot;push&quot;: true
+    }
+  },
+  &quot;tags&quot;: [&quot;beta_user&quot;, &quot;early_adopter&quot;]
+}
+</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_asynchttp">
+                                        <pre><code>AsyncHttpClient client &#x3D; new DefaultAsyncHttpClient();
+client.prepare(&quot;POST&quot;, &quot;https://echo.usebruno.com/&quot;)
+  .setHeader(&quot;content-type&quot;, &quot;application/json&quot;)
+  .setBody(&quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;)
+  .execute()
+  .toCompletableFuture()
+  .thenAccept(System.out::println)
+  .join();
+
+client.close();</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_nethttp">
+                                        <pre><code>HttpRequest request &#x3D; HttpRequest.newBuilder()
+    .uri(URI.create(&quot;https://echo.usebruno.com/&quot;))
+    .header(&quot;content-type&quot;, &quot;application/json&quot;)
+    .method(&quot;POST&quot;, HttpRequest.BodyPublishers.ofString(&quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;))
+    .build();
+HttpResponse&lt;String&gt; response &#x3D; HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+System.out.println(response.body());</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_okhttp">
+                                        <pre><code>OkHttpClient client &#x3D; new OkHttpClient();
+
+MediaType mediaType &#x3D; MediaType.parse(&quot;application/json&quot;);
+RequestBody body &#x3D; RequestBody.create(mediaType, &quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;);
+Request request &#x3D; new Request.Builder()
+  .url(&quot;https://echo.usebruno.com/&quot;)
+  .post(body)
+  .addHeader(&quot;content-type&quot;, &quot;application/json&quot;)
+  .build();
+
+Response response &#x3D; client.newCall(request).execute();</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_unirest">
+                                        <pre><code>HttpResponse&lt;String&gt; response &#x3D; Unirest.post(&quot;https://echo.usebruno.com/&quot;)
+  .header(&quot;content-type&quot;, &quot;application/json&quot;)
+  .body(&quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;)
+  .asString();</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_xhr">
+                                        <pre><code>const data &#x3D; JSON.stringify({
+  id: &#x27;usr_918273&#x27;,
+  name: &#x27;Ava Thompson&#x27;,
+  email: &#x27;ava.thompson@example.com&#x27;,
+  age: 29,
+  role: &#x27;product_manager&#x27;,
+  is_active: true,
+  created_at: &#x27;2025-10-22T14:35:00Z&#x27;,
+  preferences: {
+    language: &#x27;en&#x27;,
+    timezone: &#x27;America/New_York&#x27;,
+    notifications: {
+      email: true,
+      sms: false,
+      push: true
+    }
+  },
+  tags: [
+    &#x27;beta_user&#x27;,
+    &#x27;early_adopter&#x27;
+  ]
+});
+
+const xhr &#x3D; new XMLHttpRequest();
+xhr.withCredentials &#x3D; true;
+
+xhr.addEventListener(&#x27;readystatechange&#x27;, function () {
+  if (this.readyState &#x3D;&#x3D;&#x3D; this.DONE) {
+    console.log(this.responseText);
+  }
+});
+
+xhr.open(&#x27;POST&#x27;, &#x27;https://echo.usebruno.com/&#x27;);
+xhr.setRequestHeader(&#x27;content-type&#x27;, &#x27;application/json&#x27;);
+
+xhr.send(data);</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_axios">
+                                        <pre><code>import axios from &#x27;axios&#x27;;
+
+const options &#x3D; {
+  method: &#x27;POST&#x27;,
+  url: &#x27;https://echo.usebruno.com/&#x27;,
+  headers: {&#x27;content-type&#x27;: &#x27;application/json&#x27;},
+  data: {
+    id: &#x27;usr_918273&#x27;,
+    name: &#x27;Ava Thompson&#x27;,
+    email: &#x27;ava.thompson@example.com&#x27;,
+    age: 29,
+    role: &#x27;product_manager&#x27;,
+    is_active: true,
+    created_at: &#x27;2025-10-22T14:35:00Z&#x27;,
+    preferences: {
+      language: &#x27;en&#x27;,
+      timezone: &#x27;America/New_York&#x27;,
+      notifications: {email: true, sms: false, push: true}
+    },
+    tags: [&#x27;beta_user&#x27;, &#x27;early_adopter&#x27;]
+  }
+};
+
+try {
+  const { data } &#x3D; await axios.request(options);
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_fetch">
+                                        <pre><code>const url &#x3D; &#x27;https://echo.usebruno.com/&#x27;;
+const options &#x3D; {
+  method: &#x27;POST&#x27;,
+  headers: {&#x27;content-type&#x27;: &#x27;application/json&#x27;},
+  body: &#x27;{&quot;id&quot;:&quot;usr_918273&quot;,&quot;name&quot;:&quot;Ava Thompson&quot;,&quot;email&quot;:&quot;ava.thompson@example.com&quot;,&quot;age&quot;:29,&quot;role&quot;:&quot;product_manager&quot;,&quot;is_active&quot;:true,&quot;created_at&quot;:&quot;2025-10-22T14:35:00Z&quot;,&quot;preferences&quot;:{&quot;language&quot;:&quot;en&quot;,&quot;timezone&quot;:&quot;America/New_York&quot;,&quot;notifications&quot;:{&quot;email&quot;:true,&quot;sms&quot;:false,&quot;push&quot;:true}},&quot;tags&quot;:[&quot;beta_user&quot;,&quot;early_adopter&quot;]}&#x27;
+};
+
+try {
+  const response &#x3D; await fetch(url, options);
+  const data &#x3D; await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_jquery">
+                                        <pre><code>const settings &#x3D; {
+  async: true,
+  crossDomain: true,
+  url: &#x27;https://echo.usebruno.com/&#x27;,
+  method: &#x27;POST&#x27;,
+  headers: {
+    &#x27;content-type&#x27;: &#x27;application/json&#x27;
+  },
+  processData: false,
+  data: &#x27;{\n  &quot;id&quot;: &quot;usr_918273&quot;,\n  &quot;name&quot;: &quot;Ava Thompson&quot;,\n  &quot;email&quot;: &quot;ava.thompson@example.com&quot;,\n  &quot;age&quot;: 29,\n  &quot;role&quot;: &quot;product_manager&quot;,\n  &quot;is_active&quot;: true,\n  &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,\n  &quot;preferences&quot;: {\n    &quot;language&quot;: &quot;en&quot;,\n    &quot;timezone&quot;: &quot;America/New_York&quot;,\n    &quot;notifications&quot;: {\n      &quot;email&quot;: true,\n      &quot;sms&quot;: false,\n      &quot;push&quot;: true\n    }\n  },\n  &quot;tags&quot;: [&quot;beta_user&quot;, &quot;early_adopter&quot;]\n}\n&#x27;
+};
+
+$.ajax(settings).done(function (response) {
+  console.log(response);
+});</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="kotlin_okhttp">
+                                        <pre><code>val client &#x3D; OkHttpClient()
+
+val mediaType &#x3D; MediaType.parse(&quot;application/json&quot;)
+val body &#x3D; RequestBody.create(mediaType, &quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;)
+val request &#x3D; Request.Builder()
+  .url(&quot;https://echo.usebruno.com/&quot;)
+  .post(body)
+  .addHeader(&quot;content-type&quot;, &quot;application/json&quot;)
+  .build()
+
+val response &#x3D; client.newCall(request).execute()</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_native">
+                                        <pre><code>const http &#x3D; require(&#x27;https&#x27;);
+
+const options &#x3D; {
+  method: &#x27;POST&#x27;,
+  hostname: &#x27;echo.usebruno.com&#x27;,
+  port: null,
+  path: &#x27;/&#x27;,
+  headers: {
+    &#x27;content-type&#x27;: &#x27;application/json&#x27;
+  }
+};
+
+const req &#x3D; http.request(options, function (res) {
+  const chunks &#x3D; [];
+
+  res.on(&#x27;data&#x27;, function (chunk) {
+    chunks.push(chunk);
+  });
+
+  res.on(&#x27;end&#x27;, function () {
+    const body &#x3D; Buffer.concat(chunks);
+    console.log(body.toString());
+  });
+});
+
+req.write(JSON.stringify({
+  id: &#x27;usr_918273&#x27;,
+  name: &#x27;Ava Thompson&#x27;,
+  email: &#x27;ava.thompson@example.com&#x27;,
+  age: 29,
+  role: &#x27;product_manager&#x27;,
+  is_active: true,
+  created_at: &#x27;2025-10-22T14:35:00Z&#x27;,
+  preferences: {
+    language: &#x27;en&#x27;,
+    timezone: &#x27;America/New_York&#x27;,
+    notifications: {email: true, sms: false, push: true}
+  },
+  tags: [&#x27;beta_user&#x27;, &#x27;early_adopter&#x27;]
+}));
+req.end();</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_request">
+                                        <pre><code>const request &#x3D; require(&#x27;request&#x27;);
+
+const options &#x3D; {
+  method: &#x27;POST&#x27;,
+  url: &#x27;https://echo.usebruno.com/&#x27;,
+  headers: {&#x27;content-type&#x27;: &#x27;application/json&#x27;},
+  body: {
+    id: &#x27;usr_918273&#x27;,
+    name: &#x27;Ava Thompson&#x27;,
+    email: &#x27;ava.thompson@example.com&#x27;,
+    age: 29,
+    role: &#x27;product_manager&#x27;,
+    is_active: true,
+    created_at: &#x27;2025-10-22T14:35:00Z&#x27;,
+    preferences: {
+      language: &#x27;en&#x27;,
+      timezone: &#x27;America/New_York&#x27;,
+      notifications: {email: true, sms: false, push: true}
+    },
+    tags: [&#x27;beta_user&#x27;, &#x27;early_adopter&#x27;]
+  },
+  json: true
+};
+
+request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+
+  console.log(body);
+});</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_unirest">
+                                        <pre><code>const unirest &#x3D; require(&#x27;unirest&#x27;);
+
+const req &#x3D; unirest(&#x27;POST&#x27;, &#x27;https://echo.usebruno.com/&#x27;);
+
+req.headers({
+  &#x27;content-type&#x27;: &#x27;application/json&#x27;
+});
+
+req.type(&#x27;json&#x27;);
+req.send({
+  id: &#x27;usr_918273&#x27;,
+  name: &#x27;Ava Thompson&#x27;,
+  email: &#x27;ava.thompson@example.com&#x27;,
+  age: 29,
+  role: &#x27;product_manager&#x27;,
+  is_active: true,
+  created_at: &#x27;2025-10-22T14:35:00Z&#x27;,
+  preferences: {
+    language: &#x27;en&#x27;,
+    timezone: &#x27;America/New_York&#x27;,
+    notifications: {
+      email: true,
+      sms: false,
+      push: true
+    }
+  },
+  tags: [
+    &#x27;beta_user&#x27;,
+    &#x27;early_adopter&#x27;
+  ]
+});
+
+req.end(function (res) {
+  if (res.error) throw new Error(res.error);
+
+  console.log(res.body);
+});</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_axios">
+                                        <pre><code>const axios &#x3D; require(&#x27;axios&#x27;).default;
+
+const options &#x3D; {
+  method: &#x27;POST&#x27;,
+  url: &#x27;https://echo.usebruno.com/&#x27;,
+  headers: {&#x27;content-type&#x27;: &#x27;application/json&#x27;},
+  data: {
+    id: &#x27;usr_918273&#x27;,
+    name: &#x27;Ava Thompson&#x27;,
+    email: &#x27;ava.thompson@example.com&#x27;,
+    age: 29,
+    role: &#x27;product_manager&#x27;,
+    is_active: true,
+    created_at: &#x27;2025-10-22T14:35:00Z&#x27;,
+    preferences: {
+      language: &#x27;en&#x27;,
+      timezone: &#x27;America/New_York&#x27;,
+      notifications: {email: true, sms: false, push: true}
+    },
+    tags: [&#x27;beta_user&#x27;, &#x27;early_adopter&#x27;]
+  }
+};
+
+try {
+  const { data } &#x3D; await axios.request(options);
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_fetch">
+                                        <pre><code>const fetch &#x3D; require(&#x27;node-fetch&#x27;);
+
+const url &#x3D; &#x27;https://echo.usebruno.com/&#x27;;
+const options &#x3D; {
+  method: &#x27;POST&#x27;,
+  headers: {&#x27;content-type&#x27;: &#x27;application/json&#x27;},
+  body: &#x27;{&quot;id&quot;:&quot;usr_918273&quot;,&quot;name&quot;:&quot;Ava Thompson&quot;,&quot;email&quot;:&quot;ava.thompson@example.com&quot;,&quot;age&quot;:29,&quot;role&quot;:&quot;product_manager&quot;,&quot;is_active&quot;:true,&quot;created_at&quot;:&quot;2025-10-22T14:35:00Z&quot;,&quot;preferences&quot;:{&quot;language&quot;:&quot;en&quot;,&quot;timezone&quot;:&quot;America/New_York&quot;,&quot;notifications&quot;:{&quot;email&quot;:true,&quot;sms&quot;:false,&quot;push&quot;:true}},&quot;tags&quot;:[&quot;beta_user&quot;,&quot;early_adopter&quot;]}&#x27;
+};
+
+try {
+  const response &#x3D; await fetch(url, options);
+  const data &#x3D; await response.json();
+  console.log(data);
+} catch (error) {
+  console.error(error);
+}</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="objc_nsurlsession">
+                                        <pre><code>#import &lt;Foundation/Foundation.h&gt;
+
+NSDictionary *headers &#x3D; @{ @&quot;content-type&quot;: @&quot;application/json&quot; };
+NSDictionary *parameters &#x3D; @{ @&quot;id&quot;: @&quot;usr_918273&quot;,
+                              @&quot;name&quot;: @&quot;Ava Thompson&quot;,
+                              @&quot;email&quot;: @&quot;ava.thompson@example.com&quot;,
+                              @&quot;age&quot;: @29,
+                              @&quot;role&quot;: @&quot;product_manager&quot;,
+                              @&quot;is_active&quot;: @YES,
+                              @&quot;created_at&quot;: @&quot;2025-10-22T14:35:00Z&quot;,
+                              @&quot;preferences&quot;: @{ @&quot;language&quot;: @&quot;en&quot;, @&quot;timezone&quot;: @&quot;America/New_York&quot;, @&quot;notifications&quot;: @{ @&quot;email&quot;: @YES, @&quot;sms&quot;: @NO, @&quot;push&quot;: @YES } },
+                              @&quot;tags&quot;: @[ @&quot;beta_user&quot;, @&quot;early_adopter&quot; ] };
+
+NSData *postData &#x3D; [NSJSONSerialization dataWithJSONObject:parameters options:0 error:nil];
+
+NSMutableURLRequest *request &#x3D; [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@&quot;https://echo.usebruno.com/&quot;]
+                                                       cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                   timeoutInterval:10.0];
+[request setHTTPMethod:@&quot;POST&quot;];
+[request setAllHTTPHeaderFields:headers];
+[request setHTTPBody:postData];
+
+NSURLSession *session &#x3D; [NSURLSession sharedSession];
+NSURLSessionDataTask *dataTask &#x3D; [session dataTaskWithRequest:request
+                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                                if (error) {
+                                                    NSLog(@&quot;%@&quot;, error);
+                                                } else {
+                                                    NSHTTPURLResponse *httpResponse &#x3D; (NSHTTPURLResponse *) response;
+                                                    NSLog(@&quot;%@&quot;, httpResponse);
+                                                }
+                                            }];
+[dataTask resume];</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ocaml_cohttp">
+                                        <pre><code>open Cohttp_lwt_unix
+open Cohttp
+open Lwt
+
+let uri &#x3D; Uri.of_string &quot;https://echo.usebruno.com/&quot; in
+let headers &#x3D; Header.add (Header.init ()) &quot;content-type&quot; &quot;application/json&quot; in
+let body &#x3D; Cohttp_lwt_body.of_string &quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot; in
+
+Client.call ~headers ~body &#x60;POST uri
+&gt;&gt;&#x3D; fun (res, body_stream) -&gt;
+  (* Do stuff with the result *)</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_curl">
+                                        <pre><code>&lt;?php
+
+$curl &#x3D; curl_init();
+
+curl_setopt_array($curl, [
+  CURLOPT_URL &#x3D;&gt; &quot;https://echo.usebruno.com/&quot;,
+  CURLOPT_RETURNTRANSFER &#x3D;&gt; true,
+  CURLOPT_ENCODING &#x3D;&gt; &quot;&quot;,
+  CURLOPT_MAXREDIRS &#x3D;&gt; 10,
+  CURLOPT_TIMEOUT &#x3D;&gt; 30,
+  CURLOPT_HTTP_VERSION &#x3D;&gt; CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST &#x3D;&gt; &quot;POST&quot;,
+  CURLOPT_POSTFIELDS &#x3D;&gt; json_encode([
+    &#x27;id&#x27; &#x3D;&gt; &#x27;usr_918273&#x27;,
+    &#x27;name&#x27; &#x3D;&gt; &#x27;Ava Thompson&#x27;,
+    &#x27;email&#x27; &#x3D;&gt; &#x27;ava.thompson@example.com&#x27;,
+    &#x27;age&#x27; &#x3D;&gt; 29,
+    &#x27;role&#x27; &#x3D;&gt; &#x27;product_manager&#x27;,
+    &#x27;is_active&#x27; &#x3D;&gt; null,
+    &#x27;created_at&#x27; &#x3D;&gt; &#x27;2025-10-22T14:35:00Z&#x27;,
+    &#x27;preferences&#x27; &#x3D;&gt; [
+        &#x27;language&#x27; &#x3D;&gt; &#x27;en&#x27;,
+        &#x27;timezone&#x27; &#x3D;&gt; &#x27;America/New_York&#x27;,
+        &#x27;notifications&#x27; &#x3D;&gt; [
+                &#x27;email&#x27; &#x3D;&gt; null,
+                &#x27;sms&#x27; &#x3D;&gt; null,
+                &#x27;push&#x27; &#x3D;&gt; null
+        ]
+    ],
+    &#x27;tags&#x27; &#x3D;&gt; [
+        &#x27;beta_user&#x27;,
+        &#x27;early_adopter&#x27;
+    ]
+  ]),
+  CURLOPT_HTTPHEADER &#x3D;&gt; [
+    &quot;content-type: application/json&quot;
+  ],
+]);
+
+$response &#x3D; curl_exec($curl);
+$err &#x3D; curl_error($curl);
+
+curl_close($curl);
+
+if ($err) {
+  echo &quot;cURL Error #:&quot; . $err;
+} else {
+  echo $response;
+}</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_guzzle">
+                                        <pre><code>&lt;?php
+
+$client &#x3D; new \GuzzleHttp\Client();
+
+$response &#x3D; $client-&gt;request(&#x27;POST&#x27;, &#x27;https://echo.usebruno.com/&#x27;, [
+  &#x27;body&#x27; &#x3D;&gt; &#x27;{
+  &quot;id&quot;: &quot;usr_918273&quot;,
+  &quot;name&quot;: &quot;Ava Thompson&quot;,
+  &quot;email&quot;: &quot;ava.thompson@example.com&quot;,
+  &quot;age&quot;: 29,
+  &quot;role&quot;: &quot;product_manager&quot;,
+  &quot;is_active&quot;: true,
+  &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,
+  &quot;preferences&quot;: {
+    &quot;language&quot;: &quot;en&quot;,
+    &quot;timezone&quot;: &quot;America/New_York&quot;,
+    &quot;notifications&quot;: {
+      &quot;email&quot;: true,
+      &quot;sms&quot;: false,
+      &quot;push&quot;: true
+    }
+  },
+  &quot;tags&quot;: [&quot;beta_user&quot;, &quot;early_adopter&quot;]
+}
+&#x27;,
+  &#x27;headers&#x27; &#x3D;&gt; [
+    &#x27;content-type&#x27; &#x3D;&gt; &#x27;application/json&#x27;,
+  ],
+]);
+
+echo $response-&gt;getBody();</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http1">
+                                        <pre><code>&lt;?php
+
+$request &#x3D; new HttpRequest();
+$request-&gt;setUrl(&#x27;https://echo.usebruno.com/&#x27;);
+$request-&gt;setMethod(HTTP_METH_POST);
+
+$request-&gt;setHeaders([
+  &#x27;content-type&#x27; &#x3D;&gt; &#x27;application/json&#x27;
+]);
+
+$request-&gt;setContentType(&#x27;application/json&#x27;);
+$request-&gt;setBody(json_encode([
+  &#x27;id&#x27; &#x3D;&gt; &#x27;usr_918273&#x27;,
+  &#x27;name&#x27; &#x3D;&gt; &#x27;Ava Thompson&#x27;,
+  &#x27;email&#x27; &#x3D;&gt; &#x27;ava.thompson@example.com&#x27;,
+  &#x27;age&#x27; &#x3D;&gt; 29,
+  &#x27;role&#x27; &#x3D;&gt; &#x27;product_manager&#x27;,
+  &#x27;is_active&#x27; &#x3D;&gt; null,
+  &#x27;created_at&#x27; &#x3D;&gt; &#x27;2025-10-22T14:35:00Z&#x27;,
+  &#x27;preferences&#x27; &#x3D;&gt; [
+    &#x27;language&#x27; &#x3D;&gt; &#x27;en&#x27;,
+    &#x27;timezone&#x27; &#x3D;&gt; &#x27;America/New_York&#x27;,
+    &#x27;notifications&#x27; &#x3D;&gt; [
+        &#x27;email&#x27; &#x3D;&gt; null,
+        &#x27;sms&#x27; &#x3D;&gt; null,
+        &#x27;push&#x27; &#x3D;&gt; null
+    ]
+  ],
+  &#x27;tags&#x27; &#x3D;&gt; [
+    &#x27;beta_user&#x27;,
+    &#x27;early_adopter&#x27;
+  ]
+]));
+
+try {
+  $response &#x3D; $request-&gt;send();
+
+  echo $response-&gt;getBody();
+} catch (HttpException $ex) {
+  echo $ex;
+}</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http2">
+                                        <pre><code>&lt;?php
+
+$client &#x3D; new http\Client;
+$request &#x3D; new http\Client\Request;
+
+$body &#x3D; new http\Message\Body;
+$body-&gt;append(json_encode([
+  &#x27;id&#x27; &#x3D;&gt; &#x27;usr_918273&#x27;,
+  &#x27;name&#x27; &#x3D;&gt; &#x27;Ava Thompson&#x27;,
+  &#x27;email&#x27; &#x3D;&gt; &#x27;ava.thompson@example.com&#x27;,
+  &#x27;age&#x27; &#x3D;&gt; 29,
+  &#x27;role&#x27; &#x3D;&gt; &#x27;product_manager&#x27;,
+  &#x27;is_active&#x27; &#x3D;&gt; null,
+  &#x27;created_at&#x27; &#x3D;&gt; &#x27;2025-10-22T14:35:00Z&#x27;,
+  &#x27;preferences&#x27; &#x3D;&gt; [
+    &#x27;language&#x27; &#x3D;&gt; &#x27;en&#x27;,
+    &#x27;timezone&#x27; &#x3D;&gt; &#x27;America/New_York&#x27;,
+    &#x27;notifications&#x27; &#x3D;&gt; [
+        &#x27;email&#x27; &#x3D;&gt; null,
+        &#x27;sms&#x27; &#x3D;&gt; null,
+        &#x27;push&#x27; &#x3D;&gt; null
+    ]
+  ],
+  &#x27;tags&#x27; &#x3D;&gt; [
+    &#x27;beta_user&#x27;,
+    &#x27;early_adopter&#x27;
+  ]
+]));
+$request-&gt;setRequestUrl(&#x27;https://echo.usebruno.com/&#x27;);
+$request-&gt;setRequestMethod(&#x27;POST&#x27;);
+$request-&gt;setBody($body);
+
+$request-&gt;setHeaders([
+  &#x27;content-type&#x27; &#x3D;&gt; &#x27;application/json&#x27;
+]);
+
+$client-&gt;enqueue($request)-&gt;send();
+$response &#x3D; $client-&gt;getResponse();
+
+echo $response-&gt;getBody();</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_webrequest">
+                                        <pre><code>$headers&#x3D;@{}
+$headers.Add(&quot;content-type&quot;, &quot;application/json&quot;)
+$response &#x3D; Invoke-WebRequest -Uri &#x27;https://echo.usebruno.com/&#x27; -Method POST -Headers $headers -ContentType &#x27;application/json&#x27; -Body &#x27;{
+  &quot;id&quot;: &quot;usr_918273&quot;,
+  &quot;name&quot;: &quot;Ava Thompson&quot;,
+  &quot;email&quot;: &quot;ava.thompson@example.com&quot;,
+  &quot;age&quot;: 29,
+  &quot;role&quot;: &quot;product_manager&quot;,
+  &quot;is_active&quot;: true,
+  &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,
+  &quot;preferences&quot;: {
+    &quot;language&quot;: &quot;en&quot;,
+    &quot;timezone&quot;: &quot;America/New_York&quot;,
+    &quot;notifications&quot;: {
+      &quot;email&quot;: true,
+      &quot;sms&quot;: false,
+      &quot;push&quot;: true
+    }
+  },
+  &quot;tags&quot;: [&quot;beta_user&quot;, &quot;early_adopter&quot;]
+}
+&#x27;</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_restmethod">
+                                        <pre><code>$headers&#x3D;@{}
+$headers.Add(&quot;content-type&quot;, &quot;application/json&quot;)
+$response &#x3D; Invoke-RestMethod -Uri &#x27;https://echo.usebruno.com/&#x27; -Method POST -Headers $headers -ContentType &#x27;application/json&#x27; -Body &#x27;{
+  &quot;id&quot;: &quot;usr_918273&quot;,
+  &quot;name&quot;: &quot;Ava Thompson&quot;,
+  &quot;email&quot;: &quot;ava.thompson@example.com&quot;,
+  &quot;age&quot;: 29,
+  &quot;role&quot;: &quot;product_manager&quot;,
+  &quot;is_active&quot;: true,
+  &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,
+  &quot;preferences&quot;: {
+    &quot;language&quot;: &quot;en&quot;,
+    &quot;timezone&quot;: &quot;America/New_York&quot;,
+    &quot;notifications&quot;: {
+      &quot;email&quot;: true,
+      &quot;sms&quot;: false,
+      &quot;push&quot;: true
+    }
+  },
+  &quot;tags&quot;: [&quot;beta_user&quot;, &quot;early_adopter&quot;]
+}
+&#x27;</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_python3">
+                                        <pre><code>import http.client
+
+conn &#x3D; http.client.HTTPSConnection(&quot;echo.usebruno.com&quot;)
+
+payload &#x3D; &quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;
+
+headers &#x3D; { &#x27;content-type&#x27;: &quot;application/json&quot; }
+
+conn.request(&quot;POST&quot;, &quot;/&quot;, payload, headers)
+
+res &#x3D; conn.getresponse()
+data &#x3D; res.read()
+
+print(data.decode(&quot;utf-8&quot;))</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_requests">
+                                        <pre><code>import requests
+
+url &#x3D; &quot;https://echo.usebruno.com/&quot;
+
+payload &#x3D; {
+    &quot;id&quot;: &quot;usr_918273&quot;,
+    &quot;name&quot;: &quot;Ava Thompson&quot;,
+    &quot;email&quot;: &quot;ava.thompson@example.com&quot;,
+    &quot;age&quot;: 29,
+    &quot;role&quot;: &quot;product_manager&quot;,
+    &quot;is_active&quot;: True,
+    &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,
+    &quot;preferences&quot;: {
+        &quot;language&quot;: &quot;en&quot;,
+        &quot;timezone&quot;: &quot;America/New_York&quot;,
+        &quot;notifications&quot;: {
+            &quot;email&quot;: True,
+            &quot;sms&quot;: False,
+            &quot;push&quot;: True
+        }
+    },
+    &quot;tags&quot;: [&quot;beta_user&quot;, &quot;early_adopter&quot;]
+}
+headers &#x3D; {&quot;content-type&quot;: &quot;application/json&quot;}
+
+response &#x3D; requests.post(url, json&#x3D;payload, headers&#x3D;headers)
+
+print(response.json())</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="r_httr">
+                                        <pre><code>library(httr)
+
+url &lt;- &quot;https://echo.usebruno.com/&quot;
+
+payload &lt;- &quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;
+
+encode &lt;- &quot;json&quot;
+
+response &lt;- VERB(&quot;POST&quot;, url, body &#x3D; payload, content_type(&quot;application/json&quot;), encode &#x3D; encode)
+
+content(response, &quot;text&quot;)</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_native">
+                                        <pre><code>require &#x27;uri&#x27;
+require &#x27;net/http&#x27;
+
+url &#x3D; URI(&quot;https://echo.usebruno.com/&quot;)
+
+http &#x3D; Net::HTTP.new(url.host, url.port)
+http.use_ssl &#x3D; true
+
+request &#x3D; Net::HTTP::Post.new(url)
+request[&quot;content-type&quot;] &#x3D; &#x27;application/json&#x27;
+request.body &#x3D; &quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;
+
+response &#x3D; http.request(request)
+puts response.read_body</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_faraday">
+                                        <pre><code>require &#x27;faraday&#x27;
+
+conn &#x3D; Faraday.new(
+  url: &#x27;https://echo.usebruno.com&#x27;,
+  headers: {&#x27;Content-Type&#x27; &#x3D;&gt; &#x27;application/json&#x27;}
+)
+
+response &#x3D; conn.post(&#x27;/&#x27;) do |req|
+  req.body &#x3D; &quot;{\n  \&quot;id\&quot;: \&quot;usr_918273\&quot;,\n  \&quot;name\&quot;: \&quot;Ava Thompson\&quot;,\n  \&quot;email\&quot;: \&quot;ava.thompson@example.com\&quot;,\n  \&quot;age\&quot;: 29,\n  \&quot;role\&quot;: \&quot;product_manager\&quot;,\n  \&quot;is_active\&quot;: true,\n  \&quot;created_at\&quot;: \&quot;2025-10-22T14:35:00Z\&quot;,\n  \&quot;preferences\&quot;: {\n    \&quot;language\&quot;: \&quot;en\&quot;,\n    \&quot;timezone\&quot;: \&quot;America/New_York\&quot;,\n    \&quot;notifications\&quot;: {\n      \&quot;email\&quot;: true,\n      \&quot;sms\&quot;: false,\n      \&quot;push\&quot;: true\n    }\n  },\n  \&quot;tags\&quot;: [\&quot;beta_user\&quot;, \&quot;early_adopter\&quot;]\n}\n&quot;
+end
+
+puts response.status
+puts response.body</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="rust_reqwest">
+                                        <pre><code>use serde_json::json;
+use reqwest;
+
+#[tokio::main]
+pub async fn main() {
+    let url &#x3D; &quot;https://echo.usebruno.com/&quot;;
+
+    let payload &#x3D; json!({
+        &quot;id&quot;: &quot;usr_918273&quot;,
+        &quot;name&quot;: &quot;Ava Thompson&quot;,
+        &quot;email&quot;: &quot;ava.thompson@example.com&quot;,
+        &quot;age&quot;: 29,
+        &quot;role&quot;: &quot;product_manager&quot;,
+        &quot;is_active&quot;: true,
+        &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,
+        &quot;preferences&quot;: json!({
+            &quot;language&quot;: &quot;en&quot;,
+            &quot;timezone&quot;: &quot;America/New_York&quot;,
+            &quot;notifications&quot;: json!({
+                &quot;email&quot;: true,
+                &quot;sms&quot;: false,
+                &quot;push&quot;: true
+            })
+        }),
+        &quot;tags&quot;: (&quot;beta_user&quot;, &quot;early_adopter&quot;)
+    });
+
+    let mut headers &#x3D; reqwest::header::HeaderMap::new();
+    headers.insert(&quot;content-type&quot;, &quot;application/json&quot;.parse().unwrap());
+
+    let client &#x3D; reqwest::Client::new();
+    let response &#x3D; client.post(url)
+        .headers(headers)
+        .json(&amp;payload)
+        .send()
+        .await;
+
+    let results &#x3D; response.unwrap()
+        .json::&lt;serde_json::Value&gt;()
+        .await
+        .unwrap();
+
+    dbg!(results);
+}
+</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_curl">
+                                        <pre><code>curl --request POST \
+  --url https://echo.usebruno.com/ \
+  --header &#x27;content-type: application/json&#x27; \
+  --data &#x27;{
+  &quot;id&quot;: &quot;usr_918273&quot;,
+  &quot;name&quot;: &quot;Ava Thompson&quot;,
+  &quot;email&quot;: &quot;ava.thompson@example.com&quot;,
+  &quot;age&quot;: 29,
+  &quot;role&quot;: &quot;product_manager&quot;,
+  &quot;is_active&quot;: true,
+  &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,
+  &quot;preferences&quot;: {
+    &quot;language&quot;: &quot;en&quot;,
+    &quot;timezone&quot;: &quot;America/New_York&quot;,
+    &quot;notifications&quot;: {
+      &quot;email&quot;: true,
+      &quot;sms&quot;: false,
+      &quot;push&quot;: true
+    }
+  },
+  &quot;tags&quot;: [&quot;beta_user&quot;, &quot;early_adopter&quot;]
+}
+&#x27;</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_httpie">
+                                        <pre><code>echo &#x27;{
+  &quot;id&quot;: &quot;usr_918273&quot;,
+  &quot;name&quot;: &quot;Ava Thompson&quot;,
+  &quot;email&quot;: &quot;ava.thompson@example.com&quot;,
+  &quot;age&quot;: 29,
+  &quot;role&quot;: &quot;product_manager&quot;,
+  &quot;is_active&quot;: true,
+  &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,
+  &quot;preferences&quot;: {
+    &quot;language&quot;: &quot;en&quot;,
+    &quot;timezone&quot;: &quot;America/New_York&quot;,
+    &quot;notifications&quot;: {
+      &quot;email&quot;: true,
+      &quot;sms&quot;: false,
+      &quot;push&quot;: true
+    }
+  },
+  &quot;tags&quot;: [&quot;beta_user&quot;, &quot;early_adopter&quot;]
+}
+&#x27; |  \
+  http POST https://echo.usebruno.com/ \
+  content-type:application/json</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_wget">
+                                        <pre><code>wget --quiet \
+  --method POST \
+  --header &#x27;content-type: application/json&#x27; \
+  --body-data &#x27;{\n  &quot;id&quot;: &quot;usr_918273&quot;,\n  &quot;name&quot;: &quot;Ava Thompson&quot;,\n  &quot;email&quot;: &quot;ava.thompson@example.com&quot;,\n  &quot;age&quot;: 29,\n  &quot;role&quot;: &quot;product_manager&quot;,\n  &quot;is_active&quot;: true,\n  &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,\n  &quot;preferences&quot;: {\n    &quot;language&quot;: &quot;en&quot;,\n    &quot;timezone&quot;: &quot;America/New_York&quot;,\n    &quot;notifications&quot;: {\n      &quot;email&quot;: true,\n      &quot;sms&quot;: false,\n      &quot;push&quot;: true\n    }\n  },\n  &quot;tags&quot;: [&quot;beta_user&quot;, &quot;early_adopter&quot;]\n}\n&#x27; \
+  --output-document \
+  - https://echo.usebruno.com/</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="swift_nsurlsession">
+                                        <pre><code>import Foundation
+
+let headers &#x3D; [&quot;content-type&quot;: &quot;application/json&quot;]
+let parameters &#x3D; [
+  &quot;id&quot;: &quot;usr_918273&quot;,
+  &quot;name&quot;: &quot;Ava Thompson&quot;,
+  &quot;email&quot;: &quot;ava.thompson@example.com&quot;,
+  &quot;age&quot;: 29,
+  &quot;role&quot;: &quot;product_manager&quot;,
+  &quot;is_active&quot;: true,
+  &quot;created_at&quot;: &quot;2025-10-22T14:35:00Z&quot;,
+  &quot;preferences&quot;: [
+    &quot;language&quot;: &quot;en&quot;,
+    &quot;timezone&quot;: &quot;America/New_York&quot;,
+    &quot;notifications&quot;: [
+      &quot;email&quot;: true,
+      &quot;sms&quot;: false,
+      &quot;push&quot;: true
+    ]
+  ],
+  &quot;tags&quot;: [&quot;beta_user&quot;, &quot;early_adopter&quot;]
+] as [String : Any]
+
+let postData &#x3D; JSONSerialization.data(withJSONObject: parameters, options: [])
+
+let request &#x3D; NSMutableURLRequest(url: NSURL(string: &quot;https://echo.usebruno.com/&quot;)! as URL,
+                                        cachePolicy: .useProtocolCachePolicy,
+                                    timeoutInterval: 10.0)
+request.httpMethod &#x3D; &quot;POST&quot;
+request.allHTTPHeaderFields &#x3D; headers
+request.httpBody &#x3D; postData as Data
+
+let session &#x3D; URLSession.shared
+let dataTask &#x3D; session.dataTask(with: request as URLRequest, completionHandler: { (data, response, error) -&gt; Void in
+  if (error !&#x3D; nil) {
+    print(error as Any)
+  } else {
+    let httpResponse &#x3D; response as? HTTPURLResponse
+    print(httpResponse)
+  }
+})
+
+dataTask.resume()</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row row-no-padding row-eq-height">
+                            <div class="col-md-6 section">
+                                <div class="api-information" id="single-object-in-array">
+                                    <div class="heading">
+                                        <div class="name">
+                                            <span class="POST method">POST</span>
+                                            Single Object in Array
+                                        </div>
+                                    </div>
+
+                                    <div class="url">{{baseUrl}}</div>
+
+
+
+
+                                    <div class="request-body">
+                                        <div class="body-heading">BODY <span class="body-type">multipartForm</span></div>
+                                        <hr>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 examples">
+                                <div class="sample-request">
+                                    <div class="heading">
+                                        <span>Code Examples</span>
+                                    </div>
+                                    <div class="language-selector">
+                                        <select class="lang-dropdown" data-request-id="single-object-in-array">
+                                            <option value="c_libcurl">C</option>
+                                            <option value="clojure_clj_http">Clojure</option>
+                                            <option value="crystal_native">Crystal</option>
+                                            <option value="csharp_httpclient">C# - HttpClient</option>
+                                            <option value="csharp_restsharp">C# - RestSharp</option>
+                                            <option value="go_native">Go</option>
+                                            <option value="http_http1.1">HTTP</option>
+                                            <option value="java_asynchttp">Java - AsyncHttp</option>
+                                            <option value="java_nethttp">Java - java.net.http</option>
+                                            <option value="java_okhttp">Java - OkHttp</option>
+                                            <option value="java_unirest">Java - Unirest</option>
+                                            <option value="javascript_xhr">JavaScript - XMLHttpRequest</option>
+                                            <option value="javascript_axios">JavaScript - Axios</option>
+                                            <option value="javascript_fetch">JavaScript - fetch</option>
+                                            <option value="javascript_jquery">JavaScript - jQuery</option>
+                                            <option value="kotlin_okhttp">Kotlin</option>
+                                            <option value="node_native">Node.js - HTTP</option>
+                                            <option value="node_request">Node.js - Request</option>
+                                            <option value="node_unirest">Node.js - Unirest</option>
+                                            <option value="node_axios">Node.js - Axios</option>
+                                            <option value="node_fetch">Node.js - Fetch</option>
+                                            <option value="objc_nsurlsession">Objective-C</option>
+                                            <option value="ocaml_cohttp">OCaml</option>
+                                            <option value="php_curl">PHP - cURL</option>
+                                            <option value="php_guzzle">PHP - Guzzle</option>
+                                            <option value="php_http1">PHP - HTTP v1</option>
+                                            <option value="php_http2">PHP - HTTP v2</option>
+                                            <option value="powershell_webrequest">Powershell - Invoke-WebRequest</option>
+                                            <option value="powershell_restmethod">Powershell - Invoke-RestMethod</option>
+                                            <option value="python_python3">Python - http.client</option>
+                                            <option value="python_requests">Python - Requests</option>
+                                            <option value="r_httr">R</option>
+                                            <option value="ruby_native">Ruby - net::http</option>
+                                            <option value="ruby_faraday">Ruby - faraday</option>
+                                            <option value="rust_reqwest">Rust</option>
+                                            <option value="shell_curl">Shell - cURL</option>
+                                            <option value="shell_httpie">Shell - HTTPie</option>
+                                            <option value="shell_wget">Shell - Wget</option>
+                                            <option value="swift_nsurlsession">Swift</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="code-samples" data-request-id="single-object-in-array">
+                                    <div class="code-sample active" data-lang="c_libcurl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="clojure_clj_http">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="crystal_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_httpclient">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_restsharp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="go_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="http_http1.1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_asynchttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_nethttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_xhr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_jquery">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="kotlin_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_request">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="objc_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ocaml_cohttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_guzzle">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http2">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_webrequest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_restmethod">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_python3">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_requests">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="r_httr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_faraday">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="rust_reqwest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_httpie">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_wget">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="swift_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row row-no-padding row-eq-height">
+                            <div class="col-md-6 section">
+                                <div class="api-information" id="order-block-by-line-number">
+                                    <div class="heading">
+                                        <div class="name">
+                                            <span class="POST method">POST</span>
+                                            Order Block by Line Number
+                                        </div>
+                                    </div>
+
+                                    <div class="url">{{baseUrl}}</div>
+
+
+
+
+                                    <div class="request-body">
+                                        <div class="body-heading">BODY <span class="body-type">json</span></div>
+                                        <hr>
+                                        <div class="raw-body">
+                                            <pre><code>{
+    &quot;items&quot;: [
+        {
+            &quot;orderID&quot;: &quot;0000001211&quot;,
+            &quot;orderInvoiceNo&quot;: &quot;1234567&quot;,
+            &quot;OrderBlocks&quot;: [
+                {
+                    &quot;lineNo&quot;: 1,
+                    &quot;productCode&quot;: &quot;001&quot;
+                },
+                {
+                    &quot;lineNo&quot;: 2,
+                    &quot;productCode&quot;: &quot;012&quot;
+                },
+                {
+                    &quot;lineNo&quot;: 3,
+                    &quot;productCode&quot;: &quot;013&quot;
+                },
+                {
+                    &quot;lineNo&quot;: 4,
+                    &quot;productCode&quot;: &quot;014&quot;
+                }
+            ]
+        }
+    ]
+}</code></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 examples">
+                                <div class="sample-request">
+                                    <div class="heading">
+                                        <span>Code Examples</span>
+                                    </div>
+                                    <div class="language-selector">
+                                        <select class="lang-dropdown" data-request-id="order-block-by-line-number">
+                                            <option value="c_libcurl">C</option>
+                                            <option value="clojure_clj_http">Clojure</option>
+                                            <option value="crystal_native">Crystal</option>
+                                            <option value="csharp_httpclient">C# - HttpClient</option>
+                                            <option value="csharp_restsharp">C# - RestSharp</option>
+                                            <option value="go_native">Go</option>
+                                            <option value="http_http1.1">HTTP</option>
+                                            <option value="java_asynchttp">Java - AsyncHttp</option>
+                                            <option value="java_nethttp">Java - java.net.http</option>
+                                            <option value="java_okhttp">Java - OkHttp</option>
+                                            <option value="java_unirest">Java - Unirest</option>
+                                            <option value="javascript_xhr">JavaScript - XMLHttpRequest</option>
+                                            <option value="javascript_axios">JavaScript - Axios</option>
+                                            <option value="javascript_fetch">JavaScript - fetch</option>
+                                            <option value="javascript_jquery">JavaScript - jQuery</option>
+                                            <option value="kotlin_okhttp">Kotlin</option>
+                                            <option value="node_native">Node.js - HTTP</option>
+                                            <option value="node_request">Node.js - Request</option>
+                                            <option value="node_unirest">Node.js - Unirest</option>
+                                            <option value="node_axios">Node.js - Axios</option>
+                                            <option value="node_fetch">Node.js - Fetch</option>
+                                            <option value="objc_nsurlsession">Objective-C</option>
+                                            <option value="ocaml_cohttp">OCaml</option>
+                                            <option value="php_curl">PHP - cURL</option>
+                                            <option value="php_guzzle">PHP - Guzzle</option>
+                                            <option value="php_http1">PHP - HTTP v1</option>
+                                            <option value="php_http2">PHP - HTTP v2</option>
+                                            <option value="powershell_webrequest">Powershell - Invoke-WebRequest</option>
+                                            <option value="powershell_restmethod">Powershell - Invoke-RestMethod</option>
+                                            <option value="python_python3">Python - http.client</option>
+                                            <option value="python_requests">Python - Requests</option>
+                                            <option value="r_httr">R</option>
+                                            <option value="ruby_native">Ruby - net::http</option>
+                                            <option value="ruby_faraday">Ruby - faraday</option>
+                                            <option value="rust_reqwest">Rust</option>
+                                            <option value="shell_curl">Shell - cURL</option>
+                                            <option value="shell_httpie">Shell - HTTPie</option>
+                                            <option value="shell_wget">Shell - Wget</option>
+                                            <option value="swift_nsurlsession">Swift</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="code-samples" data-request-id="order-block-by-line-number">
+                                    <div class="code-sample active" data-lang="c_libcurl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="clojure_clj_http">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="crystal_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_httpclient">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="csharp_restsharp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="go_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="http_http1.1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_asynchttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_nethttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="java_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_xhr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="javascript_jquery">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="kotlin_okhttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_request">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_unirest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_axios">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="node_fetch">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="objc_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ocaml_cohttp">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_guzzle">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http1">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="php_http2">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_webrequest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="powershell_restmethod">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_python3">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="python_requests">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="r_httr">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_native">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="ruby_faraday">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="rust_reqwest">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_curl">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_httpie">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="shell_wget">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                    <div class="code-sample " data-lang="swift_nsurlsession">
+                                        <pre><code># Code generation not available for this request</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+    <script src="assets/script.js"></script>
+    <script>
+        // Data from server
+        var treeData = [{"text":"Enumerate (Key + value) object properties","type":"request","method":"POST","href":"#enumerate--key---value--object-properties"},{"text":"Get key by value in object","type":"request","method":"POST","href":"#get-key-by-value-in-object"},{"text":"Get object keys","type":"request","method":"POST","href":"#get-object-keys"},{"text":"Get object values","type":"request","method":"POST","href":"#get-object-values"},{"text":"test","type":"request","method":"POST","href":"#test"},{"text":"Single Object in Array","type":"request","method":"POST","href":"#single-object-in-array"},{"text":"Order Block by Line Number","type":"request","method":"POST","href":"#order-block-by-line-number"}];
+
+        function renderTree(nodes, container, level = 0) {
+            if (!nodes || nodes.length === 0) return;
+
+            const ul = document.createElement('ul');
+            ul.className = 'tree-list';
+            if (level > 0) ul.style.paddingLeft = '1rem';
+
+            nodes.forEach(node => {
+                const li = document.createElement('li');
+                li.className = 'tree-item';
+
+                if (node.type === 'folder') {
+                    // Folder item
+                    const folderHeader = document.createElement('div');
+                    folderHeader.className = 'folder-header';
+                    folderHeader.innerHTML = `
+                        <i class="fas fa-chevron-right folder-icon"></i>
+                        <span class="folder-name">${node.text}</span>
+                    `;
+                    folderHeader.style.cursor = 'pointer';
+                    folderHeader.style.padding = '0.5rem';
+                    folderHeader.style.fontWeight = '600';
+
+                    li.appendChild(folderHeader);
+
+                    if (node.nodes && node.nodes.length > 0) {
+                        const childContainer = document.createElement('div');
+                        childContainer.className = 'folder-children';
+                        childContainer.style.display = 'none';
+                        renderTree(node.nodes, childContainer, level + 1);
+                        li.appendChild(childContainer);
+
+                        // Toggle folder
+                        folderHeader.addEventListener('click', function() {
+                            const isOpen = childContainer.style.display !== 'none';
+                            childContainer.style.display = isOpen ? 'none' : 'block';
+                            folderHeader.querySelector('.folder-icon').className =
+                                isOpen ? 'fas fa-chevron-right folder-icon' : 'fas fa-chevron-down folder-icon';
+                        });
+                    }
+                } else if (node.type === 'request') {
+                    // Request item
+                    const link = document.createElement('a');
+                    link.href = node.href;
+                    link.className = 'request-link';
+                    link.style.display = 'flex';
+                    link.style.alignItems = 'center';
+                    link.style.padding = '0.5rem';
+                    link.style.textDecoration = 'none';
+                    link.style.color = 'inherit';
+                    link.style.gap = '0.5rem';
+
+                    const methodSpan = document.createElement('span');
+                    methodSpan.className = 'method ' + node.method;
+                    methodSpan.textContent = node.method;
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = node.text;
+
+                    link.appendChild(methodSpan);
+                    link.appendChild(nameSpan);
+                    li.appendChild(link);
+                }
+
+                ul.appendChild(li);
+            });
+
+            container.appendChild(ul);
+        }
+
+        // Handle language dropdown changes
+        function setupLanguageDropdowns() {
+            const dropdowns = document.querySelectorAll('.lang-dropdown');
+            dropdowns.forEach(dropdown => {
+                dropdown.addEventListener('change', function() {
+                    const requestId = this.getAttribute('data-request-id');
+                    const selectedLang = this.value;
+
+                    // Hide all code samples for this request
+                    const container = document.querySelector(`.code-samples[data-request-id="${requestId}"]`);
+                    if (container) {
+                        container.querySelectorAll('.code-sample').forEach(sample => {
+                            sample.classList.remove('active');
+                        });
+
+                        // Show the selected language's code sample
+                        const selectedSample = container.querySelector(`.code-sample[data-lang="${selectedLang}"]`);
+                        if (selectedSample) {
+                            selectedSample.classList.add('active');
+                        }
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const treeContainer = document.getElementById('tree');
+            if (treeContainer && treeData) {
+                renderTree(treeData, treeContainer);
+            }
+
+            setupLanguageDropdowns();
+        });
+    </script>
+
+    <!-- Fetch in Bruno Button Script -->
+    <script src="https://fetch.usebruno.com/button.js"></script>
+</body>
+</html>
+

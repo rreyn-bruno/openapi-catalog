@@ -1,0 +1,26 @@
+meta {
+  name: Creates list of users with given input array.
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/user/createWithList
+  body: json
+  auth: inherit
+}
+
+body:json {
+  [
+    {
+      "id": 0,
+      "username": "",
+      "firstName": "",
+      "lastName": "",
+      "email": "",
+      "password": "",
+      "phone": "",
+      "userStatus": 0
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "name": "bruno-doc-gen",
+  "version": "0.1.0",
+  "description": "Generate beautiful HTML documentation from Bruno API collections",
+  "main": "src/index.js",
+  "bin": {
+    "bruno-docs": "bin/bruno-docs",
+    "openapi-to-bruno": "bin/openapi-to-bruno"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bruno",
+    "api",
+    "documentation",
+    "docs",
+    "generator",
+    "api-docs",
+    "bruno-api",
+    "static-site"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/bruno-doc-gen.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/bruno-doc-gen/issues"
+  },
+  "homepage": "https://github.com/yourusername/bruno-doc-gen#readme",
+  "dependencies": {
+    "@usebruno/converters": "^0.13.1",
+    "@usebruno/filestore": "^0.4.0",
+    "commander": "^9.0.0",
+    "fs-extra": "^11.0.0",
+    "handlebars": "^4.7.7",
+    "httpsnippet": "^3.0.9",
+    "js-yaml": "^4.1.0",
+    "markdown-it": "^14.1.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

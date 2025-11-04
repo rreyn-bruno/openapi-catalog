@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <nav id="sidebar" class="sidebar-wrapper">
+            <div class="sidebar-content">
+                <div class="sidebar-item sidebar-brand">{{title}}</div>
+                <div class="sidebar-item sidebar-menu">
+                    <div id="tree"></div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="page-content">
+            <div class="container-fluid">
+                <div class="row d-flex align-items-center p-3 border-bottom">
+                    <div class="col-md-1">
+                        <a id="toggle-sidebar" class="btn rounded-0 p-3" href="#">
+                            <i class="fas fa-bars"></i>
+                        </a>
+                    </div>
+                    <div class="col-md-9">
+                        <h5 class="mb-0">{{collection.name}}</h5>
+                    </div>
+                    <div class="col-md-2 text-right">
+                        {{#if brunoCollectionUrl}}
+                        <!-- Fetch in Bruno Button -->
+                        <div class="bruno-fetch-button" data-bruno-collection-url="{{brunoCollectionUrl}}"></div>
+                        {{/if}}
+                    </div>
+                </div>
+
+                <div class="row p-lg-4">
+                    <article class="main-content col-md-12" id="doc-body">
+                        {{#if collection.docs}}
+                        <div class="row row-no-padding">
+                            <div class="col-md-12">
+                                <div class="api-information">
+                                    <div class="collection-description">
+                                        {{{markdown collection.docs}}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{/if}}
+
+                        {{#each items}}
+                        <div class="row row-no-padding row-eq-height">
+                            <div class="col-md-6 section">
+                                <div class="api-information" id="{{id}}">
+                                    <div class="heading">
+                                        <div class="name">
+                                            <span class="{{request.method}} method">{{request.method}}</span>
+                                            {{name}}
+                                        </div>
+                                    </div>
+
+                                    {{#if request.url}}
+                                    <div class="url">{{request.url}}</div>
+                                    {{/if}}
+
+                                    {{#if docs}}
+                                    <div class="description request-description">
+                                        {{{markdown docs}}}
+                                    </div>
+                                    {{/if}}
+
+                                    {{#if request.headers}}
+                                    {{#if (hasEnabledItems request.headers)}}
+                                    <div class="request-body">
+                                        <div class="body-heading">HEADERS</div>
+                                        <hr>
+                                        {{#each request.headers}}
+                                        {{#if enabled}}
+                                        <div class="param row">
+                                            <div class="name col-md-3">{{name}}</div>
+                                            <div class="value col-md-9">{{value}}</div>
+                                        </div>
+                                        {{/if}}
+                                        {{/each}}
+                                    </div>
+                                    {{/if}}
+                                    {{/if}}
+
+                                    {{#if request.params}}
+                                    {{#if (hasEnabledItems request.params)}}
+                                    <div class="request-body">
+                                        <div class="body-heading">QUERY PARAMS</div>
+                                        <hr>
+                                        {{#each request.params}}
+                                        {{#if enabled}}
+                                        <div class="param row">
+                                            <div class="name col-md-3">{{name}}</div>
+                                            <div class="value col-md-9">{{value}}</div>
+                                        </div>
+                                        {{/if}}
+                                        {{/each}}
+                                    </div>
+                                    {{/if}}
+                                    {{/if}}
+
+                                    {{#if request.body}}
+                                    {{#unless (eq request.body.mode 'none')}}
+                                    <div class="request-body">
+                                        <div class="body-heading">BODY <span class="body-type">{{request.body.mode}}</span></div>
+                                        <hr>
+                                        {{#if (eq request.body.mode 'json')}}
+                                        <div class="raw-body">
+                                            <pre><code>{{request.body.json}}</code></pre>
+                                        </div>
+                                        {{/if}}
+                                        {{#if (eq request.body.mode 'xml')}}
+                                        <div class="raw-body">
+                                            <pre><code>{{request.body.xml}}</code></pre>
+                                        </div>
+                                        {{/if}}
+                                        {{#if (eq request.body.mode 'formUrlEncoded')}}
+                                        {{#each request.body.formUrlEncoded}}
+                                        {{#if enabled}}
+                                        <div class="param row">
+                                            <div class="name col-md-3">{{name}}</div>
+                                            <div class="value col-md-9">{{value}}</div>
+                                        </div>
+                                        {{/if}}
+                                        {{/each}}
+                                        {{/if}}
+                                    </div>
+                                    {{/unless}}
+                                    {{/if}}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 examples">
+                                <div class="sample-request">
+                                    <div class="heading">
+                                        <span>Code Examples</span>
+                                    </div>
+                                    <div class="language-selector">
+                                        <select class="lang-dropdown" data-request-id="{{id}}">
+                                            {{#each codeSamples}}
+                                            <option value="{{@key}}">{{name}}</option>
+                                            {{/each}}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="code-samples" data-request-id="{{id}}">
+                                    {{#each codeSamples}}
+                                    <div class="code-sample {{#unless @index}}active{{/unless}}" data-lang="{{@key}}">
+                                        <pre><code>{{code}}</code></pre>
+                                    </div>
+                                    {{/each}}
+                                </div>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </article>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+    <script src="assets/script.js"></script>
+    <script>
+        // Data from server
+        var treeData = {{{sidebarTree}}};
+
+        function renderTree(nodes, container, level = 0) {
+            if (!nodes || nodes.length === 0) return;
+
+            const ul = document.createElement('ul');
+            ul.className = 'tree-list';
+            if (level > 0) ul.style.paddingLeft = '1rem';
+
+            nodes.forEach(node => {
+                const li = document.createElement('li');
+                li.className = 'tree-item';
+
+                if (node.type === 'folder') {
+                    // Folder item
+                    const folderHeader = document.createElement('div');
+                    folderHeader.className = 'folder-header';
+                    folderHeader.innerHTML = `
+                        <i class="fas fa-chevron-right folder-icon"></i>
+                        <span class="folder-name">${node.text}</span>
+                    `;
+                    folderHeader.style.cursor = 'pointer';
+                    folderHeader.style.padding = '0.5rem';
+                    folderHeader.style.fontWeight = '600';
+
+                    li.appendChild(folderHeader);
+
+                    if (node.nodes && node.nodes.length > 0) {
+                        const childContainer = document.createElement('div');
+                        childContainer.className = 'folder-children';
+                        childContainer.style.display = 'none';
+                        renderTree(node.nodes, childContainer, level + 1);
+                        li.appendChild(childContainer);
+
+                        // Toggle folder
+                        folderHeader.addEventListener('click', function() {
+                            const isOpen = childContainer.style.display !== 'none';
+                            childContainer.style.display = isOpen ? 'none' : 'block';
+                            folderHeader.querySelector('.folder-icon').className =
+                                isOpen ? 'fas fa-chevron-right folder-icon' : 'fas fa-chevron-down folder-icon';
+                        });
+                    }
+                } else if (node.type === 'request') {
+                    // Request item
+                    const link = document.createElement('a');
+                    link.href = node.href;
+                    link.className = 'request-link';
+                    link.style.display = 'flex';
+                    link.style.alignItems = 'center';
+                    link.style.padding = '0.5rem';
+                    link.style.textDecoration = 'none';
+                    link.style.color = 'inherit';
+                    link.style.gap = '0.5rem';
+
+                    const methodSpan = document.createElement('span');
+                    methodSpan.className = 'method ' + node.method;
+                    methodSpan.textContent = node.method;
+
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = node.text;
+
+                    link.appendChild(methodSpan);
+                    link.appendChild(nameSpan);
+                    li.appendChild(link);
+                }
+
+                ul.appendChild(li);
+            });
+
+            container.appendChild(ul);
+        }
+
+        // Handle language dropdown changes
+        function setupLanguageDropdowns() {
+            const dropdowns = document.querySelectorAll('.lang-dropdown');
+            dropdowns.forEach(dropdown => {
+                dropdown.addEventListener('change', function() {
+                    const requestId = this.getAttribute('data-request-id');
+                    const selectedLang = this.value;
+
+                    // Hide all code samples for this request
+                    const container = document.querySelector(`.code-samples[data-request-id="${requestId}"]`);
+                    if (container) {
+                        container.querySelectorAll('.code-sample').forEach(sample => {
+                            sample.classList.remove('active');
+                        });
+
+                        // Show the selected language's code sample
+                        const selectedSample = container.querySelector(`.code-sample[data-lang="${selectedLang}"]`);
+                        if (selectedSample) {
+                            selectedSample.classList.add('active');
+                        }
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const treeContainer = document.getElementById('tree');
+            if (treeContainer && treeData) {
+                renderTree(treeData, treeContainer);
+            }
+
+            setupLanguageDropdowns();
+        });
+    </script>
+
+    <!-- Fetch in Bruno Button Script -->
+    <script src="https://fetch.usebruno.com/button.js"></script>
+</body>
+</html>
+

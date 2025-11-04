@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Output
+*.log
+*.tgz
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test output
+test-output/
+coverage/
