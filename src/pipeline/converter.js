@@ -10,7 +10,7 @@ class ConversionPipeline {
   constructor(options = {}) {
     // Use absolute paths to avoid issues when changing directories
     const rootDir = path.resolve(__dirname, '../..');
-    this.brunoDocGenPath = options.brunoDocGenPath || path.resolve(rootDir, '../bruno-doc-gen');
+    this.brunoDocGenPath = options.brunoDocGenPath || path.resolve(rootDir, 'bruno-doc-gen');
     this.collectionsDir = options.collectionsDir || path.resolve(rootDir, 'data/collections');
     this.docsDir = options.docsDir || path.resolve(rootDir, 'data/docs');
     this.openapiDir = options.openapiDir || path.resolve(rootDir, 'data/openapi');
