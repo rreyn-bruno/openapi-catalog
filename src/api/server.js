@@ -247,6 +247,24 @@ class CatalogServer {
         res.status(500).json({ error: error.message });
       }
     });
+
+    // Regenerate documentation for all APIs
+    this.app.post('/api/regenerate-docs', async (req, res) => {
+      try {
+        const { apiId = null } = req.body;
+
+        res.json({
+          message: apiId ? `Regenerating docs for API ${apiId}` : 'Regenerating docs for all APIs',
+          status: 'running'
+        });
+
+        // Run regeneration in background
+        this.regenerateDocs(apiId);
+
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
   }
 
   async runScrape(runId, options) {
@@ -385,6 +403,65 @@ class CatalogServer {
 
     } catch (error) {
       console.error('APIs.guru import error:', error);
+    }
+  }
+
+  async regenerateDocs(apiId = null) {
+    try {
+      console.log('\n=== Starting documentation regeneration ===');
+
+      const pipeline = new ConversionPipeline();
+
+      // Get APIs to regenerate
+      const apis = apiId ? [this.db.getApi(apiId)] : this.db.getAllApis({ limit: 10000 });
+
+      console.log(`Regenerating docs for ${apis.length} API(s)...`);
+
+      let regenerated = 0;
+      let failed = 0;
+
+      for (const api of apis) {
+        if (!api) continue;
+
+        try {
+          console.log(`\nRegenerating docs for: ${api.name}`);
+
+          // Check if collection exists
+          if (!api.collection_path || !fs.existsSync(api.collection_path)) {
+            console.log(`⚠️  Collection not found for ${api.name}, skipping...`);
+            failed++;
+            continue;
+          }
+
+          // Regenerate documentation
+          const docsPath = await pipeline.generateDocs(
+            api.id,
+            api.name,
+            api.collection_path,
+            api.github_url
+          );
+
+          // Update database with new docs path
+          this.db.updateApi(api.id, {
+            docs_path: docsPath,
+            updated_at: new Date().toISOString()
+          });
+
+          console.log(`✓ Regenerated docs for ${api.name}`);
+          regenerated++;
+
+        } catch (error) {
+          console.error(`✗ Error regenerating docs for ${api.name}:`, error.message);
+          failed++;
+        }
+      }
+
+      console.log('\n=== Documentation regeneration completed ===');
+      console.log(`Regenerated: ${regenerated}`);
+      console.log(`Failed: ${failed}`);
+
+    } catch (error) {
+      console.error('Documentation regeneration error:', error);
     }
   }
 
