@@ -97,8 +97,10 @@ class GitHubScraper {
       }
 
       try {
-        const query = `filename:${pattern} stars:>=${minStars}`;
-        console.log(`\n=== Searching: ${query} ===`);
+        // Note: GitHub Code Search API doesn't support stars: qualifier
+        // We'll filter by stars after getting repo info
+        const query = `filename:${pattern}`;
+        console.log(`\n=== Searching: ${query} (will filter by ${minStars}+ stars) ===`);
 
         // Check rate limit before starting this search
         await this.checkRateLimit();
