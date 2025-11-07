@@ -7,6 +7,64 @@ class GitHubScraper {
       auth: token,
       userAgent: 'bruno-api-catalog/1.0.0'
     });
+    this.rateLimitResetTime = null;
+  }
+
+  /**
+   * Check and handle rate limits
+   * @returns {Promise<void>}
+   */
+  async checkRateLimit() {
+    try {
+      const { data } = await this.octokit.rateLimit.get();
+      const codeSearch = data.resources.search;
+
+      console.log(`\n📊 Rate Limit Status:`);
+      console.log(`   Remaining: ${codeSearch.remaining}/${codeSearch.limit}`);
+      console.log(`   Resets at: ${new Date(codeSearch.reset * 1000).toLocaleTimeString()}`);
+
+      // If we're low on requests, wait
+      if (codeSearch.remaining < 2) {
+        const resetTime = new Date(codeSearch.reset * 1000);
+        const waitTime = resetTime - Date.now() + 5000; // Add 5 second buffer
+
+        if (waitTime > 0) {
+          console.log(`\n⏳ Rate limit reached. Waiting ${Math.ceil(waitTime / 1000)} seconds until reset...`);
+          await this.sleep(waitTime);
+          console.log(`✅ Rate limit reset! Continuing...`);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking rate limit:', error.message);
+    }
+  }
+
+  /**
+   * Handle rate limit errors with automatic retry
+   * @param {Error} error - The error to check
+   * @returns {Promise<boolean>} - True if we should retry
+   */
+  async handleRateLimitError(error) {
+    if (error.status === 403 && error.message.includes('rate limit')) {
+      console.log('\n🚨 Rate limit exceeded! Checking reset time...');
+
+      try {
+        const { data } = await this.octokit.rateLimit.get();
+        const resetTime = new Date(data.resources.search.reset * 1000);
+        const waitTime = resetTime - Date.now() + 5000; // Add 5 second buffer
+
+        if (waitTime > 0) {
+          console.log(`⏳ Waiting ${Math.ceil(waitTime / 1000)} seconds for rate limit reset...`);
+          console.log(`   Reset time: ${resetTime.toLocaleString()}`);
+          await this.sleep(waitTime);
+          console.log(`✅ Rate limit reset! Retrying...`);
+          return true; // Signal to retry
+        }
+      } catch (e) {
+        console.error('Error getting rate limit info:', e.message);
+      }
+    }
+    return false; // Don't retry
   }
 
   /**
@@ -61,6 +119,9 @@ class GitHubScraper {
           const query = `filename:${pattern} ${starQuery}`;
           console.log(`\n=== Searching: ${query} ===`);
 
+          // Check rate limit before starting this search
+          await this.checkRateLimit();
+
           // GitHub API limits to 1000 results per query (10 pages of 100)
           const maxPages = 10;
 
@@ -71,16 +132,42 @@ class GitHubScraper {
               break;
             }
 
-            try {
-              // Search for files with pagination
-              const searchResults = await this.octokit.search.code({
-                q: query,
-                per_page: 100,
-                page: page,
-                sort: 'indexed'
-              });
+            // Check rate limit before each page
+            await this.checkRateLimit();
 
-              console.log(`Page ${page}: Found ${searchResults.data.items.length} files`);
+            let searchResults;
+            let retryCount = 0;
+            const maxRetries = 3;
+
+            // Retry loop for rate limit errors
+            while (retryCount < maxRetries) {
+              try {
+                // Search for files with pagination
+                searchResults = await this.octokit.search.code({
+                  q: query,
+                  per_page: 100,
+                  page: page,
+                  sort: 'indexed'
+                });
+                break; // Success, exit retry loop
+              } catch (error) {
+                const shouldRetry = await this.handleRateLimitError(error);
+                if (shouldRetry && retryCount < maxRetries - 1) {
+                  retryCount++;
+                  console.log(`Retry attempt ${retryCount}/${maxRetries}...`);
+                  continue;
+                } else {
+                  throw error; // Re-throw if not rate limit or max retries reached
+                }
+              }
+            }
+
+            if (!searchResults) {
+              console.log(`Failed to get results after ${maxRetries} retries`);
+              break;
+            }
+
+            console.log(`Page ${page}: Found ${searchResults.data.items.length} files`);
 
               // If no more results, break pagination
               if (searchResults.data.items.length === 0) {
@@ -169,6 +256,9 @@ class GitHubScraper {
               break; // Stop pagination on error
             }
           }
+
+          // Small delay between searches to avoid hitting rate limits
+          await this.sleep(2000);
 
           // Stop searching other ranges if we've reached maxResults
           if (results.length >= maxResults) {
