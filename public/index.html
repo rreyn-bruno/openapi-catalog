@@ -607,7 +607,7 @@
       </div>
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
-        <input type="search" id="searchInput" placeholder="Search APIs by name, description, or tags...">
+        <input type="search" id="searchInput" placeholder="Search APIs by name or tags...">
       </div>
       <div class="filter-tags" id="filterTags">
         <!-- Tags will be populated here -->
@@ -635,6 +635,7 @@
     let allApis = [];
     let allTags = [];
     let activeFilter = null;
+    let searchTimeout = null;
 
     // Load stats
     async function loadStats() {
@@ -729,16 +730,15 @@
         );
       }
 
-      // Apply search filter
+      // Apply search filter - ONLY search names and tags for performance
       if (searchQuery) {
         filtered = filtered.filter(api => {
           const nameMatch = api.name && api.name.toLowerCase().includes(searchQuery);
-          const descMatch = api.description && api.description.toLowerCase().includes(searchQuery);
           const tagMatch = api.tags && api.tags.some(tag => {
             const tagName = typeof tag === 'string' ? tag : tag.name;
             return tagName.toLowerCase().includes(searchQuery);
           });
-          return nameMatch || descMatch || tagMatch;
+          return nameMatch || tagMatch;
         });
       }
 
@@ -753,6 +753,14 @@
       }
 
       renderApis(filtered);
+    }
+
+    // Debounced search function
+    function debouncedSearch() {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      searchTimeout = setTimeout(filterApis, 150); // Wait 150ms after user stops typing
     }
 
     // Load APIs
@@ -897,13 +905,10 @@
 
     // Wait for DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
-      // Search functionality - use the filterApis function
+      // Search functionality - use debounced search for better performance
       const searchInput = document.getElementById('searchInput');
       if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
-          console.log('Search input:', e.target.value);
-          filterApis();
-        });
+        searchInput.addEventListener('input', debouncedSearch);
       }
 
       // Sort and filter controls
