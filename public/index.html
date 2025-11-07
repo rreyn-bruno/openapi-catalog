@@ -288,11 +288,10 @@
       color: var(--text-secondary);
     }
 
-    .api-table th:nth-child(1) { width: 46%; }  /* API (Name/Description) */
-    .api-table th:nth-child(2) { width: 15%; }  /* Tags */
-    .api-table th:nth-child(3) { width: 6%; }  /* Source */
-    .api-table th:nth-child(4) { width: 8%; }   /* Version */
-    .api-table th:nth-child(5) { width: 25%; }  /* Actions */
+    .api-table th:nth-child(1) { width: 50%; }  /* API (Name/Description) */
+    .api-table th:nth-child(2) { width: 18%; }  /* Tags */
+    .api-table th:nth-child(3) { width: 10%; }   /* Version */
+    .api-table th:nth-child(4) { width: 22%; }  /* Actions */
 
     .api-table tbody tr {
       border-bottom: 1px solid #d1d5db;
@@ -527,18 +526,16 @@
         padding: 0.75rem 0.5rem;
       }
 
-      /* Hide version and source columns on mobile */
+      /* Hide version column on mobile */
       .api-table th:nth-child(3),
-      .api-table td:nth-child(3),
-      .api-table th:nth-child(4),
-      .api-table td:nth-child(4) {
+      .api-table td:nth-child(3) {
         display: none;
       }
 
       /* Adjust column widths for mobile */
-      .api-table th:nth-child(1) { width: 45%; }
-      .api-table th:nth-child(2) { width: 25%; }
-      .api-table th:nth-child(5) { width: 30%; }
+      .api-table th:nth-child(1) { width: 50%; }
+      .api-table th:nth-child(2) { width: 20%; }
+      .api-table th:nth-child(4) { width: 30%; }
 
       .api-actions {
         flex-direction: column;
@@ -717,7 +714,7 @@
 
     // Filter APIs based on search and active filter
     function filterApis() {
-      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
       const sortBy = document.getElementById('sortBy').value;
 
       let filtered = allApis;
@@ -725,19 +722,24 @@
       // Apply tag filter (normalize both sides for comparison)
       if (activeFilter) {
         filtered = filtered.filter(api =>
-          api.tags && api.tags.some(tag =>
-            normalizeTagName(tag).toLowerCase() === normalizeTagName(activeFilter).toLowerCase()
-          )
+          api.tags && api.tags.some(tag => {
+            const tagName = typeof tag === 'string' ? tag : tag.name;
+            return normalizeTagName(tagName).toLowerCase() === normalizeTagName(activeFilter).toLowerCase();
+          })
         );
       }
 
       // Apply search filter
       if (searchQuery) {
-        filtered = filtered.filter(api =>
-          (api.name && api.name.toLowerCase().includes(searchQuery)) ||
-          (api.description && api.description.toLowerCase().includes(searchQuery)) ||
-          (api.tags && api.tags.some(tag => tag.toLowerCase().includes(searchQuery)))
-        );
+        filtered = filtered.filter(api => {
+          const nameMatch = api.name && api.name.toLowerCase().includes(searchQuery);
+          const descMatch = api.description && api.description.toLowerCase().includes(searchQuery);
+          const tagMatch = api.tags && api.tags.some(tag => {
+            const tagName = typeof tag === 'string' ? tag : tag.name;
+            return tagName.toLowerCase().includes(searchQuery);
+          });
+          return nameMatch || descMatch || tagMatch;
+        });
       }
 
       // Apply sorting
@@ -824,7 +826,6 @@
               <tr>
                 <th>API</th>
                 <th>Tags</th>
-                <th>Source</th>
                 <th>Version</th>
                 <th>Actions</th>
               </tr>
@@ -843,9 +844,6 @@
                 const sourceUrl = api.github_url || api.source_url;
                 const isGitHub = sourceUrl && sourceUrl.includes('github.com');
                 const sourceLabel = isGitHub ? 'GitHub' : 'Source';
-                const sourceBadge = api.source === 'apis-guru'
-                  ? '<span class="tag" style="background: #8b5cf6; color: white;">APIs.guru</span>'
-                  : '<span class="tag" style="background: #3b82f6; color: white;">GitHub</span>';
 
                 return `
                   <tr>
@@ -855,9 +853,6 @@
                     </td>
                     <td>
                       <div class="api-tags">${tags}</div>
-                    </td>
-                    <td>
-                      ${sourceBadge}
                     </td>
                     <td>
                       <span style="color: var(--text-secondary); font-size: 0.875rem;">v${api.version || '1.0.0'}</span>
@@ -900,37 +895,46 @@
       content.innerHTML = tableHTML;
     }
 
-    // Search functionality - use the filterApis function
-    document.getElementById('searchInput').addEventListener('input', filterApis);
-
-    // Sort and filter controls
-    document.getElementById('sortBy').addEventListener('change', filterApis);
-    document.getElementById('categoryFilter').addEventListener('change', function() {
-      activeFilter = this.value || null;
-
-      // Update filter tag UI
-      document.querySelectorAll('.filter-tag').forEach(el => {
-        el.classList.remove('active');
-      });
-
-      if (activeFilter) {
-        document.querySelectorAll('.filter-tag').forEach(el => {
-          if (el.textContent.startsWith(activeFilter)) {
-            el.classList.add('active');
-          }
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+      // Search functionality - use the filterApis function
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+          console.log('Search input:', e.target.value);
+          filterApis();
         });
       }
 
-      filterApis();
+      // Sort and filter controls
+      document.getElementById('sortBy').addEventListener('change', filterApis);
+      document.getElementById('categoryFilter').addEventListener('change', function() {
+        activeFilter = this.value || null;
+
+        // Update filter tag UI
+        document.querySelectorAll('.filter-tag').forEach(el => {
+          el.classList.remove('active');
+        });
+
+        if (activeFilter) {
+          document.querySelectorAll('.filter-tag').forEach(el => {
+            if (el.textContent.startsWith(activeFilter)) {
+              el.classList.add('active');
+            }
+          });
+        }
+
+        filterApis();
+      });
+
+      // Initialize
+      loadStats();
+      loadApis();
+      loadTags();
+
+      // Refresh stats every 30 seconds
+      setInterval(loadStats, 30000);
     });
-
-    // Initialize
-    loadStats();
-    loadApis();
-    loadTags();
-
-    // Refresh stats every 30 seconds
-    setInterval(loadStats, 30000);
   </script>
 </body>
 </html>
