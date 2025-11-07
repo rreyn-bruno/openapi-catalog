@@ -169,91 +169,87 @@ class GitHubScraper {
 
             console.log(`Page ${page}: Found ${searchResults.data.items.length} files`);
 
-              // If no more results, break pagination
-              if (searchResults.data.items.length === 0) {
-                console.log(`No more results for this query`);
+            // If no more results, break pagination
+            if (searchResults.data.items.length === 0) {
+              console.log(`No more results for this query`);
+              break;
+            }
+
+            for (const item of searchResults.data.items) {
+              // Stop if we've reached maxResults
+              if (results.length >= maxResults) {
+                console.log(`Reached max results (${maxResults}), stopping...`);
                 break;
               }
 
-              for (const item of searchResults.data.items) {
-                // Stop if we've reached maxResults
-                if (results.length >= maxResults) {
-                  console.log(`Reached max results (${maxResults}), stopping...`);
-                  break;
-                }
+              // Create unique key for this repo+path combination
+              const repoKey = `${item.repository.owner.login}/${item.repository.name}/${item.path}`;
 
-                // Create unique key for this repo+path combination
-                const repoKey = `${item.repository.owner.login}/${item.repository.name}/${item.path}`;
+              // Skip if we've already processed this exact file
+              if (seenRepos.has(repoKey)) {
+                console.log(`Skipping duplicate: ${repoKey}`);
+                continue;
+              }
 
-                // Skip if we've already processed this exact file
-                if (seenRepos.has(repoKey)) {
-                  console.log(`Skipping duplicate: ${repoKey}`);
+              try {
+                // Get repository info
+                const repo = await this.octokit.repos.get({
+                  owner: item.repository.owner.login,
+                  repo: item.repository.name
+                });
+
+                // Filter by stars AFTER getting repo info
+                if (repo.data.stargazers_count < minStars) {
+                  console.log(`Skipping ${repo.data.full_name} (${repo.data.stargazers_count} stars < ${minStars})`);
                   continue;
                 }
 
+                // Get file content
+                const fileContent = await this.octokit.repos.getContent({
+                  owner: item.repository.owner.login,
+                  repo: item.repository.name,
+                  path: item.path
+                });
+
+                // Decode content
+                const content = Buffer.from(fileContent.data.content, 'base64').toString('utf-8');
+
+                // Try to parse as JSON or YAML
+                let spec;
                 try {
-                  // Get repository info
-                  const repo = await this.octokit.repos.get({
-                    owner: item.repository.owner.login,
-                    repo: item.repository.name
-                  });
-
-                  // Filter by stars AFTER getting repo info
-                  if (repo.data.stargazers_count < minStars) {
-                    console.log(`Skipping ${repo.data.full_name} (${repo.data.stargazers_count} stars < ${minStars})`);
-                    continue;
-                  }
-
-                  // Get file content
-                  const fileContent = await this.octokit.repos.getContent({
-                    owner: item.repository.owner.login,
-                    repo: item.repository.name,
-                    path: item.path
-                  });
-
-                  // Decode content
-                  const content = Buffer.from(fileContent.data.content, 'base64').toString('utf-8');
-
-                  // Try to parse as JSON or YAML
-                  let spec;
-                  try {
-                    spec = JSON.parse(content);
-                  } catch (e) {
-                    // If not JSON, might be YAML - we'll handle this in the pipeline
-                    spec = { raw: content };
-                  }
-
-                  // Mark this repo as seen
-                  seenRepos.add(repoKey);
-
-                  results.push({
-                    id: uuidv4(),
-                    name: spec.info?.title || repo.data.name,
-                    description: spec.info?.description || repo.data.description || '',
-                    version: spec.info?.version || '1.0.0',
-                    github_url: repo.data.html_url,
-                    openapi_url: fileContent.data.download_url,
-                    stars: repo.data.stargazers_count,
-                    file_path: item.path,
-                    repo_owner: item.repository.owner.login,
-                    repo_name: item.repository.name,
-                    spec: spec,
-                    source: 'github-scrape',
-                    source_url: fileContent.data.download_url,
-                    last_synced_at: new Date().toISOString()
-                  });
-
-                  console.log(`✓ Added ${repo.data.full_name} (${repo.data.stargazers_count} stars)`);
-
-                  // Rate limiting - be nice to GitHub
-                  await this.sleep(1000);
-                } catch (error) {
-                  console.error(`Error processing ${item.path}:`, error.message);
+                  spec = JSON.parse(content);
+                } catch (e) {
+                  // If not JSON, might be YAML - we'll handle this in the pipeline
+                  spec = { raw: content };
                 }
+
+                // Mark this repo as seen
+                seenRepos.add(repoKey);
+
+                results.push({
+                  id: uuidv4(),
+                  name: spec.info?.title || repo.data.name,
+                  description: spec.info?.description || repo.data.description || '',
+                  version: spec.info?.version || '1.0.0',
+                  github_url: repo.data.html_url,
+                  openapi_url: fileContent.data.download_url,
+                  stars: repo.data.stargazers_count,
+                  file_path: item.path,
+                  repo_owner: item.repository.owner.login,
+                  repo_name: item.repository.name,
+                  spec: spec,
+                  source: 'github-scrape',
+                  source_url: fileContent.data.download_url,
+                  last_synced_at: new Date().toISOString()
+                });
+
+                console.log(`✓ Added ${repo.data.full_name} (${repo.data.stargazers_count} stars)`);
+
+                // Rate limiting - be nice to GitHub
+                await this.sleep(1000);
+              } catch (error) {
+                console.error(`Error processing ${item.path}:`, error.message);
               }
-            } catch (error) {
-              console.error(`Error fetching page ${page}:`, error.message);
-              break; // Stop pagination on error
             }
           }
 
