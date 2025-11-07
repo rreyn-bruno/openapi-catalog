@@ -288,9 +288,9 @@
       color: var(--text-secondary);
     }
 
-    .api-table th:nth-child(1) { width: 40%; }  /* API (Name/Description) */
+    .api-table th:nth-child(1) { width: 46%; }  /* API (Name/Description) */
     .api-table th:nth-child(2) { width: 15%; }  /* Tags */
-    .api-table th:nth-child(3) { width: 12%; }  /* Source */
+    .api-table th:nth-child(3) { width: 6%; }  /* Source */
     .api-table th:nth-child(4) { width: 8%; }   /* Version */
     .api-table th:nth-child(5) { width: 25%; }  /* Actions */
 
@@ -358,8 +358,19 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.375rem;
-      max-height: 3rem;
+      max-height: 2.5rem;
       overflow: hidden;
+      position: relative;
+    }
+
+    .api-tags::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 30%;
+      height: 1.2rem;
+      background: linear-gradient(to right, transparent, var(--bg-primary));
     }
 
     .tag {
@@ -478,7 +489,7 @@
 
     @media (max-width: 768px) {
       .header-text h1 {
-        font-size: 2rem;
+        font-size: 1.5rem;
       }
 
       .header-stats {
@@ -486,12 +497,29 @@
         gap: 1rem;
       }
 
+      .search-controls {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .search-controls label {
+        width: 100%;
+      }
+
+      .search-controls select {
+        width: 100%;
+      }
+
       .api-table-container {
-        padding: 0 1rem 2rem;
+        padding: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .api-table {
-        font-size: 0.875rem;
+        font-size: 0.75rem;
+        min-width: 100%;
+        width: 100%;
       }
 
       .api-table th,
@@ -499,14 +527,36 @@
         padding: 0.75rem 0.5rem;
       }
 
+      /* Hide version and source columns on mobile */
+      .api-table th:nth-child(3),
+      .api-table td:nth-child(3),
       .api-table th:nth-child(4),
       .api-table td:nth-child(4) {
         display: none;
       }
 
+      /* Adjust column widths for mobile */
+      .api-table th:nth-child(1) { width: 45%; }
+      .api-table th:nth-child(2) { width: 25%; }
+      .api-table th:nth-child(5) { width: 30%; }
+
+      .api-actions {
+        flex-direction: column;
+        gap: 0.375rem;
+      }
+
       .btn {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.8125rem;
+        padding: 0.375rem 0.625rem;
+        font-size: 0.75rem;
+        width: 100%;
+      }
+
+      .api-name {
+        font-size: 0.875rem;
+      }
+
+      .api-description {
+        font-size: 0.75rem;
       }
     }
   </style>
@@ -548,7 +598,6 @@
           Sort by:
           <select id="sortBy">
             <option value="created_at">Recently Added</option>
-            <option value="stars">Most Stars</option>
             <option value="name">Name (A-Z)</option>
           </select>
         </label>
