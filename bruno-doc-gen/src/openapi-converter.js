@@ -1,5 +1,8 @@
-const { openApiToBruno } = require('@usebruno/converters');
-const { stringifyRequest, stringifyCollection, stringifyFolder } = require('@usebruno/filestore');
+// Use enhanced converter with improved example extraction
+const { openApiToBruno } = require('./enhanced-converters/cjs/index.js');
+// Use vendored filestore with example support
+const { stringifyRequest: vendoredStringifyRequest } = require('./vendored-filestore');
+const { stringifyCollection, stringifyFolder } = require('@usebruno/filestore');
 const fs = require('fs-extra');
 const path = require('path');
 const yaml = require('js-yaml');
@@ -34,7 +37,7 @@ async function writeItems(items, currentPath) {
         // Write request file
         const filename = sanitizeName(`${item.name}.bru`);
         const filePath = path.join(currentPath, filename);
-        const content = stringifyRequest(item);
+        const content = vendoredStringifyRequest(item);
         await fs.writeFile(filePath, content, 'utf8');
         console.log(`  ✓ Created request: ${filename}`);
       } else if (item.type === 'folder') {

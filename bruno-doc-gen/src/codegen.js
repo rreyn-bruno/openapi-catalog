@@ -141,33 +141,67 @@ function buildHarRequest(request) {
     throw new Error('Request is undefined or null');
   }
 
-  return {
+  const postData = createPostData(request.body || {});
+  const harRequest = {
     method: request.method || 'GET',
     url: request.url || '',
     httpVersion: 'HTTP/1.1',
     cookies: [],
     headers: createHeaders(request, request.headers || []),
     queryString: createQuery(request.params || []),
-    postData: createPostData(request.body || {}),
     headersSize: 0,
     bodySize: 0,
     binary: true
   };
+
+  // Only include postData if it has content
+  if (Object.keys(postData).length > 0) {
+    harRequest.postData = postData;
+  }
+
+  return harRequest;
 }
 
 // Generate code snippet for a request
 function generateSnippet(request, language) {
   try {
-    const harRequest = buildHarRequest(request);
+    // Replace Bruno variables with placeholder URLs for validation
+    const variableReplacements = {};
+    let modifiedRequest = JSON.parse(JSON.stringify(request)); // Deep clone
+
+    // Replace variables in URL
+    if (modifiedRequest.url) {
+      const variableRegex = /\{\{([^}]+)\}\}/g;
+      let match;
+      while ((match = variableRegex.exec(modifiedRequest.url)) !== null) {
+        const varName = match[0]; // e.g., "{{baseUrl}}"
+        const placeholder = `https://example.com/${match[1]}`; // e.g., "https://example.com/baseUrl"
+        variableReplacements[placeholder] = varName;
+      }
+
+      // Replace all variables with placeholders
+      modifiedRequest.url = modifiedRequest.url.replace(/\{\{([^}]+)\}\}/g, (match, varName) => {
+        return `https://example.com/${varName}`;
+      });
+    }
+
+    const harRequest = buildHarRequest(modifiedRequest);
 
     // Suppress console.error temporarily to hide validation warnings
     const originalConsoleError = console.error;
     console.error = () => {};
 
     try {
-      // Pass options to disable validation
-      const snippet = new HTTPSnippet(harRequest, { validate: false });
-      const result = snippet.convert(language.target, language.client);
+      const snippet = new HTTPSnippet(harRequest);
+      let result = snippet.convert(language.target, language.client);
+
+      // Replace placeholders back with Bruno variables
+      if (result) {
+        for (const [placeholder, variable] of Object.entries(variableReplacements)) {
+          result = result.replace(new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), variable);
+        }
+      }
+
       return result || '// Code snippet generation not available for this request';
     } finally {
       // Restore console.error

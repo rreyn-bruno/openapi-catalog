@@ -32,13 +32,18 @@
   "homepage": "https://github.com/yourusername/bruno-doc-gen#readme",
   "dependencies": {
     "@usebruno/converters": "^0.13.1",
-    "@usebruno/filestore": "^0.4.0",
+    "@usebruno/filestore": "^0.1.1",
+    "@usebruno/schema": "^0.7.0",
     "commander": "^9.0.0",
     "fs-extra": "^11.0.0",
     "handlebars": "^4.7.7",
     "httpsnippet": "^3.0.9",
     "js-yaml": "^4.1.0",
-    "markdown-it": "^14.1.0"
+    "jscodeshift": "^17.3.0",
+    "lodash": "^4.17.21",
+    "markdown-it": "^14.1.0",
+    "nanoid": "3.3.8",
+    "xml2js": "^0.6.2"
   },
   "engines": {
     "node": ">=14.0.0"

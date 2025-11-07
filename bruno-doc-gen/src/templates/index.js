@@ -124,11 +124,89 @@ function flattenCollection(collection, items = [], path = []) {
           });
         }
 
+        // Generate code samples for each example's request
+        let examplesWithCode = (item.examples || []).map(example => {
+          const exampleCodeSamples = {};
+
+          if (example.request) {
+            languages.forEach(lang => {
+              const key = `${lang.target}_${lang.client}`;
+              try {
+                const code = generateSnippet(example.request, lang);
+                if (code && !code.includes('// Error:') && !code.includes('not available')) {
+                  exampleCodeSamples[key] = {
+                    name: lang.name,
+                    code: code
+                  };
+                } else {
+                  exampleCodeSamples[key] = {
+                    name: lang.name,
+                    code: `# Code generation not available for this request`
+                  };
+                }
+              } catch (error) {
+                if (!error.message.includes('afterRequest') && !error.message.includes('strict mode')) {
+                  console.error(`Error generating code for example ${example.name}:`, error.message);
+                }
+                exampleCodeSamples[key] = {
+                  name: lang.name,
+                  code: `# Code generation not available for this request`
+                };
+              }
+            });
+          }
+
+          return {
+            ...example,
+            codeSamples: exampleCodeSamples
+          };
+        });
+
+        // If no examples exist, generate a default example from the main request
+        if (examplesWithCode.length === 0 && item.request) {
+          const defaultExampleCodeSamples = {};
+
+          languages.forEach(lang => {
+            const key = `${lang.target}_${lang.client}`;
+            try {
+              const code = generateSnippet(item.request, lang);
+              if (code && !code.includes('// Error:') && !code.includes('not available')) {
+                defaultExampleCodeSamples[key] = {
+                  name: lang.name,
+                  code: code
+                };
+              } else {
+                defaultExampleCodeSamples[key] = {
+                  name: lang.name,
+                  code: `# Code generation not available for this request`
+                };
+              }
+            } catch (error) {
+              if (!error.message.includes('afterRequest') && !error.message.includes('strict mode')) {
+                console.error(`Error generating code for default example:`, error.message);
+              }
+              defaultExampleCodeSamples[key] = {
+                name: lang.name,
+                code: `# Code generation not available for this request`
+              };
+            }
+          });
+
+          examplesWithCode = [{
+            name: 'Example Request',
+            description: null,
+            request: item.request,
+            response: null,
+            codeSamples: defaultExampleCodeSamples
+          }];
+        }
+
         items.push({
           ...item,
           path: [...path, item.name],
           id: generateId([...path, item.name]),
-          codeSamples
+          codeSamples,
+          examples: examplesWithCode
         });
       }
     });

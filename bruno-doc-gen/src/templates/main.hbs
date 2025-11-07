@@ -23,13 +23,24 @@
         <main class="page-content">
             <div class="container-fluid">
                 <div class="row d-flex align-items-center p-3 border-bottom">
-                    <div class="col-md-1">
-                        <a id="toggle-sidebar" class="btn rounded-0 p-3" href="#">
-                            <i class="fas fa-bars"></i>
-                        </a>
-                    </div>
-                    <div class="col-md-9">
+                    <div class="col-md-8">
                         <h5 class="mb-0">{{collection.name}}</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="language-selector-global">
+                            <label for="global-lang-select">Language:</label>
+                            <select id="global-lang-select" class="form-control form-control-sm">
+                                <option value="shell_curl">cURL</option>
+                                <option value="javascript_fetch">JavaScript (Fetch)</option>
+                                <option value="node_native">Node.js (HTTP)</option>
+                                <option value="python_requests">Python (Requests)</option>
+                                <option value="go_native">Go</option>
+                                <option value="ruby_native">Ruby</option>
+                                <option value="java_okhttp">Java (OkHttp)</option>
+                                <option value="csharp_restsharp">C# (RestSharp)</option>
+                                <option value="php_curl">PHP (cURL)</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="col-md-2 text-right">
                         {{#if brunoCollectionUrl}}
@@ -140,26 +151,77 @@
                             </div>
 
                             <div class="col-md-6 examples">
-                                <div class="sample-request">
+                                {{#if examples}}
+                                {{#if examples.length}}
+                                <div class="examples-section">
                                     <div class="heading">
-                                        <span>Code Examples</span>
+                                        <span>Examples</span>
                                     </div>
-                                    <div class="language-selector">
-                                        <select class="lang-dropdown" data-request-id="{{id}}">
-                                            {{#each codeSamples}}
-                                            <option value="{{@key}}">{{name}}</option>
-                                            {{/each}}
-                                        </select>
-                                    </div>
-                                </div>
 
-                                <div class="code-samples" data-request-id="{{id}}">
-                                    {{#each codeSamples}}
-                                    <div class="code-sample {{#unless @index}}active{{/unless}}" data-lang="{{@key}}">
-                                        <pre><code>{{code}}</code></pre>
+                                    <!-- Request Code (shown once) -->
+                                    {{#each examples}}
+                                    {{#if @first}}
+                                    {{#if codeSamples}}
+                                    <div class="example-request-code">
+                                        <div class="body-heading">REQUEST</div>
+                                        <hr>
+                                        <div class="example-request-code-samples" data-request-id="{{../id}}" data-example-index="0">
+                                            {{#each codeSamples}}
+                                            <div class="code-sample {{#if (eq @key 'shell_curl')}}active{{/if}}" data-lang="{{@key}}">
+                                                <pre><code>{{code}}</code></pre>
+                                            </div>
+                                            {{/each}}
+                                        </div>
                                     </div>
+                                    {{/if}}
+                                    {{/if}}
                                     {{/each}}
+
+                                    <!-- Response Status Tabs -->
+                                    <div class="response-tabs" data-request-id="{{id}}">
+                                        {{#each examples}}
+                                        {{#if response}}
+                                        <button class="response-tab {{#if @first}}active{{/if}}" data-response-index="{{@index}}" data-request-id="{{../id}}">
+                                            <span class="response-status status-{{response.status}}">{{response.status}} {{response.statusText}}</span>
+                                        </button>
+                                        {{/if}}
+                                        {{/each}}
+                                    </div>
+
+                                    <!-- Response Content (one visible at a time) -->
+                                    <div class="response-content-container" data-request-id="{{id}}">
+                                        {{#each examples}}
+                                        {{#if response}}
+                                        <div class="response-content {{#if @first}}active{{/if}}" data-response-index="{{@index}}" data-request-id="{{../id}}">
+                                            {{#if response.headers}}
+                                            {{#if response.headers.length}}
+                                            <div class="response-headers">
+                                                <div class="body-heading">RESPONSE HEADERS</div>
+                                                <hr>
+                                                {{#each response.headers}}
+                                                <div class="param row">
+                                                    <div class="name col-md-4">{{name}}</div>
+                                                    <div class="value col-md-8">{{value}}</div>
+                                                </div>
+                                                {{/each}}
+                                            </div>
+                                            {{/if}}
+                                            {{/if}}
+
+                                            {{#if response.body}}
+                                            <div class="response-body">
+                                                <div class="body-heading">RESPONSE BODY <span class="body-type">{{response.body.type}}</span></div>
+                                                <hr>
+                                                <pre><code>{{response.body.content}}</code></pre>
+                                            </div>
+                                            {{/if}}
+                                        </div>
+                                        {{/if}}
+                                        {{/each}}
+                                    </div>
                                 </div>
+                                {{/if}}
+                                {{/if}}
                             </div>
                         </div>
                         {{/each}}
@@ -246,26 +308,48 @@
             container.appendChild(ul);
         }
 
-        // Handle language dropdown changes
-        function setupLanguageDropdowns() {
-            const dropdowns = document.querySelectorAll('.lang-dropdown');
-            dropdowns.forEach(dropdown => {
-                dropdown.addEventListener('change', function() {
+        // Handle global language selector
+        function setupGlobalLanguageSelector() {
+            const globalSelect = document.getElementById('global-lang-select');
+            if (!globalSelect) return;
+
+            globalSelect.addEventListener('change', function() {
+                const selectedLang = this.value;
+
+                // Update all example request code samples to show the selected language
+                document.querySelectorAll('.example-request-code-samples').forEach(container => {
+                    container.querySelectorAll('.code-sample').forEach(sample => {
+                        sample.classList.remove('active');
+                    });
+
+                    const selectedSample = container.querySelector(`.code-sample[data-lang="${selectedLang}"]`);
+                    if (selectedSample) {
+                        selectedSample.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // Handle response tab switching
+        function setupResponseTabs() {
+            document.querySelectorAll('.response-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
                     const requestId = this.getAttribute('data-request-id');
-                    const selectedLang = this.value;
+                    const responseIndex = this.getAttribute('data-response-index');
 
-                    // Hide all code samples for this request
-                    const container = document.querySelector(`.code-samples[data-request-id="${requestId}"]`);
-                    if (container) {
-                        container.querySelectorAll('.code-sample').forEach(sample => {
-                            sample.classList.remove('active');
-                        });
+                    // Update active tab
+                    document.querySelectorAll(`.response-tab[data-request-id="${requestId}"]`).forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    this.classList.add('active');
 
-                        // Show the selected language's code sample
-                        const selectedSample = container.querySelector(`.code-sample[data-lang="${selectedLang}"]`);
-                        if (selectedSample) {
-                            selectedSample.classList.add('active');
-                        }
+                    // Update visible response content
+                    document.querySelectorAll(`.response-content[data-request-id="${requestId}"]`).forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    const selectedContent = document.querySelector(`.response-content[data-request-id="${requestId}"][data-response-index="${responseIndex}"]`);
+                    if (selectedContent) {
+                        selectedContent.classList.add('active');
                     }
                 });
             });
@@ -277,7 +361,8 @@
                 renderTree(treeData, treeContainer);
             }
 
-            setupLanguageDropdowns();
+            setupGlobalLanguageSelector();
+            setupResponseTabs();
         });
     </script>
 

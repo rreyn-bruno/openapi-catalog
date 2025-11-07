@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
-const { parseRequest, parseCollection, parseFolder } = require('@usebruno/filestore');
+// Use vendored parser with example support
+const { parseRequest, parseCollection, parseFolder } = require('./vendored-parser');
 const { createTemplate } = require('./templates');
 
 async function generateDocs({ collectionPath, outputPath, theme = 'light', title, brunoCollectionUrl }) {
@@ -81,9 +82,64 @@ async function parseCollectionDirectory(collectionPath) {
         // Get the request item
         const bruContent = await fs.readFile(filePath, 'utf8');
         const requestItem = parseRequest(bruContent);
+
+        // Transform body to include mode property
+        const transformBody = (body) => {
+          if (!body) return { mode: 'none' };
+
+          // If body already has mode, return as is
+          if (body.mode) return body;
+
+          // Detect mode from body properties
+          if (body.json !== undefined) return { mode: 'json', ...body };
+          if (body.xml !== undefined) return { mode: 'xml', ...body };
+          if (body.text !== undefined) return { mode: 'text', ...body };
+          if (body.formUrlEncoded !== undefined) return { mode: 'formUrlEncoded', ...body };
+          if (body.multipartForm !== undefined) return { mode: 'multipartForm', ...body };
+          if (body.graphql !== undefined) return { mode: 'graphql', ...body };
+
+          return { mode: 'none' };
+        };
+
+        // Transform parsed structure to match template expectations
+        const request = {
+          method: requestItem.http?.method || 'GET',
+          url: requestItem.http?.url || '',
+          headers: requestItem.headers || [],
+          params: requestItem.params || [],
+          body: transformBody(requestItem.body),
+          auth: requestItem.auth || { mode: 'inherit' },
+          script: requestItem.script || {},
+          vars: requestItem.vars || {},
+          assertions: requestItem.assertions || [],
+          tests: requestItem.tests || '',
+          docs: requestItem.docs || ''
+        };
+
+        // Transform examples to ensure request structure is consistent
+        const transformedExamples = (requestItem.examples || []).map(example => {
+          if (example.request) {
+            return {
+              ...example,
+              request: {
+                method: example.request.method || 'GET',
+                url: example.request.url || '',
+                headers: example.request.headers || [],
+                params: example.request.params || [],
+                body: transformBody(example.request.body),
+                auth: example.request.auth || { mode: 'inherit' }
+              }
+            };
+          }
+          return example;
+        });
+
         currentDirItems.push({
           name: file.replace('.bru', ''),
           pathname: filePath,
+          type: requestItem.meta?.type || 'http-request',
+          request,
+          examples: transformedExamples,
           ...requestItem
         });
       }
