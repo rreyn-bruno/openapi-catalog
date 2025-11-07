@@ -3,6 +3,7 @@ const { promisify } = require('util');
 const path = require('path');
 const fs = require('fs').promises;
 const yaml = require('js-yaml');
+const axios = require('axios');
 
 const execAsync = promisify(exec);
 
@@ -66,11 +67,22 @@ class ConversionPipeline {
     // Ensure directory exists
     await fs.mkdir(this.openapiDir, { recursive: true });
 
-    // Download using curl
-    await execAsync(`curl -L "${url}" -o "${filepath}"`);
+    // Download using axios (curl not available in container)
+    const response = await axios.get(url, {
+      timeout: 30000,
+      maxContentLength: 10 * 1024 * 1024, // 10MB max
+      maxRedirects: 5
+    });
 
-    // Validate and convert if needed
-    let content = await fs.readFile(filepath, 'utf-8');
+    // Save the response data
+    let content;
+    if (typeof response.data === 'string') {
+      content = response.data;
+    } else {
+      content = JSON.stringify(response.data, null, 2);
+    }
+
+    await fs.writeFile(filepath, content, 'utf-8');
 
     // Try to parse as JSON first
     let isValidSpec = false;
