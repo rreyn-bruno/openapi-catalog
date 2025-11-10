@@ -119,6 +119,11 @@ class CatalogDatabase {
     return stmt.get(id);
   }
 
+  getApiByUrl(url) {
+    const stmt = this.db.prepare('SELECT * FROM apis WHERE openapi_url = ? OR github_url = ?');
+    return stmt.get(url, url);
+  }
+
   getAllApis(options = {}) {
     const { limit = 50, offset = 0, search = '', orderBy = 'created_at DESC' } = options;
     

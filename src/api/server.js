@@ -284,11 +284,20 @@ class CatalogServer {
       
       // Process each API
       let processed = 0;
+      let skipped = 0;
       for (const api of apis) {
         try {
+          // Check if API already exists (by URL)
+          const existing = this.db.getApiByUrl(api.openapi_url || api.github_url);
+          if (existing) {
+            console.log(`⏭️  Skipping ${api.name} (already exists in database)`);
+            skipped++;
+            continue;
+          }
+
           // Convert and generate docs
           const result = await pipeline.convertAndGenerateDocs(api);
-          
+
           if (result.success) {
             // Save to database
             this.db.createApi({
@@ -360,9 +369,11 @@ class CatalogServer {
         apis_processed: processed,
         status: 'completed'
       });
-      
+
       console.log(`\n=== Scrape run ${runId} completed ===`);
-      console.log(`Processed ${processed}/${apis.length} APIs`);
+      console.log(`Found: ${apis.length} APIs`);
+      console.log(`Processed: ${processed} new APIs`);
+      console.log(`Skipped: ${skipped} duplicates`);
     } catch (error) {
       console.error('Scrape error:', error);
       this.db.updateScrapeRun(runId, {
