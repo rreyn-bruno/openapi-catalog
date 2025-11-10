@@ -1,9 +1,0 @@
-{
-  "version": "1",
-  "name": "Swagger Petstore - OpenAPI 3.0",
-  "type": "collection",
-  "ignore": [
-    "node_modules",
-    ".git"
-  ]
-}
