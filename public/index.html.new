@@ -13,68 +13,8 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Primary Meta Tags -->
-  <title>Bruno API Catalog - Discover 2000+ OpenAPI Specifications</title>
-  <meta name="title" content="Bruno API Catalog - Discover 2000+ OpenAPI Specifications">
-  <meta name="description" content="The world's largest catalog of public OpenAPI specifications. Browse 2000+ APIs from GitHub and APIs.guru, ready to import into Bruno API client. Free and open source.">
-  <meta name="keywords" content="OpenAPI, Swagger, API catalog, Bruno, REST API, API documentation, API specifications, OpenAPI 3.0, API discovery, public APIs">
-  <meta name="author" content="Bruno API Catalog">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://openapicatalog.com/">
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://openapicatalog.com/">
-  <meta property="og:title" content="Bruno API Catalog - Discover 2000+ OpenAPI Specifications">
-  <meta property="og:description" content="The world's largest catalog of public OpenAPI specifications. Browse 2000+ APIs from GitHub and APIs.guru, ready to import into Bruno API client.">
-  <meta property="og:image" content="https://openapicatalog.com/og-image.svg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:site_name" content="Bruno API Catalog">
-
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://openapicatalog.com/">
-  <meta property="twitter:title" content="Bruno API Catalog - Discover 2000+ OpenAPI Specifications">
-  <meta property="twitter:description" content="The world's largest catalog of public OpenAPI specifications. Browse 2000+ APIs from GitHub and APIs.guru, ready to import into Bruno API client.">
-  <meta property="twitter:image" content="https://openapicatalog.com/og-image.svg">
-
-  <!-- Theme Color -->
-  <meta name="theme-color" content="#3b82f6">
-  <meta name="msapplication-TileColor" content="#3b82f6">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  <link rel="shortcut icon" href="/favicon.svg">
-
-  <!-- Structured Data (JSON-LD) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Bruno API Catalog",
-    "url": "https://openapicatalog.com/",
-    "description": "The world's largest catalog of public OpenAPI specifications",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://openapicatalog.com/?search={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "OpenAPI Specifications Catalog",
-    "description": "A comprehensive catalog of public OpenAPI specifications",
-    "numberOfItems": "2000+"
-  }
-  </script>
+  <title>Bruno API Catalog - Discover OpenAPI Specifications</title>
+  <meta name="description" content="Browse and explore a curated catalog of OpenAPI specifications from GitHub, ready to import into Bruno API client.">
   <style>
     :root {
       --primary: #3b82f6;
@@ -348,10 +288,12 @@
       color: var(--text-secondary);
     }
 
-    .api-table th:nth-child(1) { width: 50%; }  /* API (Name/Description) */
-    .api-table th:nth-child(2) { width: 18%; }  /* Tags */
-    .api-table th:nth-child(3) { width: 10%; }   /* Version */
-    .api-table th:nth-child(4) { width: 22%; }  /* Actions */
+    .api-table th:nth-child(1) { width: 45%; }  /* API (Name/Description) - increased */
+    .api-table th:nth-child(1) { width: 40%; }  /* API (Name/Description) */
+    .api-table th:nth-child(2) { width: 15%; }  /* Tags */
+    .api-table th:nth-child(3) { width: 8%; }  /* Source */
+    .api-table th:nth-child(4) { width: 8%; }   /* Version */
+    .api-table th:nth-child(5) { width: 25%; }  /* Actions */
 
     .api-table tbody tr {
       border-bottom: 1px solid #d1d5db;
@@ -417,19 +359,8 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.375rem;
-      max-height: 2.5rem;
+      max-height: 3rem;
       overflow: hidden;
-      position: relative;
-    }
-
-    .api-tags::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 30%;
-      height: 1.2rem;
-      background: linear-gradient(to right, transparent, var(--bg-primary));
     }
 
     .tag {
@@ -548,7 +479,7 @@
 
     @media (max-width: 768px) {
       .header-text h1 {
-        font-size: 1.5rem;
+        font-size: 2rem;
       }
 
       .header-stats {
@@ -556,29 +487,12 @@
         gap: 1rem;
       }
 
-      .search-controls {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .search-controls label {
-        width: 100%;
-      }
-
-      .search-controls select {
-        width: 100%;
-      }
-
       .api-table-container {
-        padding: 0;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        padding: 0 1rem 2rem;
       }
 
       .api-table {
-        font-size: 0.75rem;
-        min-width: 100%;
-        width: 100%;
+        font-size: 0.875rem;
       }
 
       .api-table th,
@@ -586,34 +500,14 @@
         padding: 0.75rem 0.5rem;
       }
 
-      /* Hide version column on mobile */
-      .api-table th:nth-child(3),
-      .api-table td:nth-child(3) {
+      .api-table th:nth-child(4),
+      .api-table td:nth-child(4) {
         display: none;
       }
 
-      /* Adjust column widths for mobile */
-      .api-table th:nth-child(1) { width: 50%; }
-      .api-table th:nth-child(2) { width: 20%; }
-      .api-table th:nth-child(4) { width: 30%; }
-
-      .api-actions {
-        flex-direction: column;
-        gap: 0.375rem;
-      }
-
       .btn {
-        padding: 0.375rem 0.625rem;
-        font-size: 0.75rem;
-        width: 100%;
-      }
-
-      .api-name {
-        font-size: 0.875rem;
-      }
-
-      .api-description {
-        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.8125rem;
       }
     }
   </style>
@@ -667,7 +561,7 @@
       </div>
       <div class="search-wrapper">
         <span class="search-icon">🔍</span>
-        <input type="search" id="searchInput" placeholder="Search APIs by name or tags...">
+        <input type="search" id="searchInput" placeholder="Search APIs by name, description, or tags...">
       </div>
       <div class="filter-tags" id="filterTags">
         <!-- Tags will be populated here -->
@@ -695,7 +589,6 @@
     let allApis = [];
     let allTags = [];
     let activeFilter = null;
-    let searchTimeout = null;
 
     // Load stats
     async function loadStats() {
@@ -775,7 +668,7 @@
 
     // Filter APIs based on search and active filter
     function filterApis() {
-      const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
       const sortBy = document.getElementById('sortBy').value;
 
       let filtered = allApis;
@@ -783,23 +676,19 @@
       // Apply tag filter (normalize both sides for comparison)
       if (activeFilter) {
         filtered = filtered.filter(api =>
-          api.tags && api.tags.some(tag => {
-            const tagName = typeof tag === 'string' ? tag : tag.name;
-            return normalizeTagName(tagName).toLowerCase() === normalizeTagName(activeFilter).toLowerCase();
-          })
+          api.tags && api.tags.some(tag =>
+            normalizeTagName(tag).toLowerCase() === normalizeTagName(activeFilter).toLowerCase()
+          )
         );
       }
 
-      // Apply search filter - ONLY search names and tags for performance
+      // Apply search filter
       if (searchQuery) {
-        filtered = filtered.filter(api => {
-          const nameMatch = api.name && api.name.toLowerCase().includes(searchQuery);
-          const tagMatch = api.tags && api.tags.some(tag => {
-            const tagName = typeof tag === 'string' ? tag : tag.name;
-            return tagName.toLowerCase().includes(searchQuery);
-          });
-          return nameMatch || tagMatch;
-        });
+        filtered = filtered.filter(api =>
+          (api.name && api.name.toLowerCase().includes(searchQuery)) ||
+          (api.description && api.description.toLowerCase().includes(searchQuery)) ||
+          (api.tags && api.tags.some(tag => tag.toLowerCase().includes(searchQuery)))
+        );
       }
 
       // Apply sorting
@@ -813,14 +702,6 @@
       }
 
       renderApis(filtered);
-    }
-
-    // Debounced search function
-    function debouncedSearch() {
-      if (searchTimeout) {
-        clearTimeout(searchTimeout);
-      }
-      searchTimeout = setTimeout(filterApis, 150); // Wait 150ms after user stops typing
     }
 
     // Load APIs
@@ -894,6 +775,7 @@
               <tr>
                 <th>API</th>
                 <th>Tags</th>
+                <th>Source</th>
                 <th>Version</th>
                 <th>Actions</th>
               </tr>
@@ -912,6 +794,9 @@
                 const sourceUrl = api.github_url || api.source_url;
                 const isGitHub = sourceUrl && sourceUrl.includes('github.com');
                 const sourceLabel = isGitHub ? 'GitHub' : 'Source';
+                const sourceBadge = api.source === 'apis-guru'
+                  ? '<span class="tag" style="background: #8b5cf6; color: white;">APIs.guru</span>'
+                  : '<span class="tag" style="background: #3b82f6; color: white;">GitHub</span>';
 
                 return `
                   <tr>
@@ -921,6 +806,9 @@
                     </td>
                     <td>
                       <div class="api-tags">${tags}</div>
+                    </td>
+                    <td>
+                      ${sourceBadge}
                     </td>
                     <td>
                       <span style="color: var(--text-secondary); font-size: 0.875rem;">v${api.version || '1.0.0'}</span>
@@ -963,43 +851,37 @@
       content.innerHTML = tableHTML;
     }
 
-    // Wait for DOM to be ready
-    document.addEventListener('DOMContentLoaded', function() {
-      // Search functionality - use debounced search for better performance
-      const searchInput = document.getElementById('searchInput');
-      if (searchInput) {
-        searchInput.addEventListener('input', debouncedSearch);
-      }
+    // Search functionality - use the filterApis function
+    document.getElementById('searchInput').addEventListener('input', filterApis);
 
-      // Sort and filter controls
-      document.getElementById('sortBy').addEventListener('change', filterApis);
-      document.getElementById('categoryFilter').addEventListener('change', function() {
-        activeFilter = this.value || null;
+    // Sort and filter controls
+    document.getElementById('sortBy').addEventListener('change', filterApis);
+    document.getElementById('categoryFilter').addEventListener('change', function() {
+      activeFilter = this.value || null;
 
-        // Update filter tag UI
-        document.querySelectorAll('.filter-tag').forEach(el => {
-          el.classList.remove('active');
-        });
-
-        if (activeFilter) {
-          document.querySelectorAll('.filter-tag').forEach(el => {
-            if (el.textContent.startsWith(activeFilter)) {
-              el.classList.add('active');
-            }
-          });
-        }
-
-        filterApis();
+      // Update filter tag UI
+      document.querySelectorAll('.filter-tag').forEach(el => {
+        el.classList.remove('active');
       });
 
-      // Initialize
-      loadStats();
-      loadApis();
-      loadTags();
+      if (activeFilter) {
+        document.querySelectorAll('.filter-tag').forEach(el => {
+          if (el.textContent.startsWith(activeFilter)) {
+            el.classList.add('active');
+          }
+        });
+      }
 
-      // Refresh stats every 30 seconds
-      setInterval(loadStats, 30000);
+      filterApis();
     });
+
+    // Initialize
+    loadStats();
+    loadApis();
+    loadTags();
+
+    // Refresh stats every 30 seconds
+    setInterval(loadStats, 30000);
   </script>
 </body>
 </html>
