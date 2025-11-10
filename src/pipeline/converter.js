@@ -147,17 +147,17 @@ class ConversionPipeline {
    */
   async generateDocs(id, name, collectionPath, githubUrl) {
     const docsPath = path.join(this.docsDir, id);
-    
+
     // Ensure directory exists
     await fs.mkdir(this.docsDir, { recursive: true });
-    
+
     // Use bruno-docs to generate documentation
     let command = `cd ${this.brunoDocGenPath} && node bin/bruno-docs generate "${collectionPath}" -o "${docsPath}" --title "${name}"`;
-    
-    // Add bruno-url if available
-    if (githubUrl) {
-      command += ` --bruno-url "${githubUrl}"`;
-    }
+
+    // Don't add bruno-url for GitHub-scraped APIs
+    // The GitHub URL points to the source repo (with OpenAPI spec), not a Bruno collection
+    // Only add bruno-url if it's an actual Bruno collection repository
+    // For now, we skip this to avoid confusing "Fetch in Bruno" buttons
     
     try {
       const { stdout, stderr } = await execAsync(command);
