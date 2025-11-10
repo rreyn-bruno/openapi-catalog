@@ -16,15 +16,15 @@
   
   <!-- Main content -->
   <text x="600" y="250" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">
-    Bruno API Catalog
+    OpenAPI Catalog
   </text>
-  
-  <text x="600" y="330" font-family="Arial, sans-serif" font-size="42" fill="rgba(255,255,255,0.9)" text-anchor="middle">
-    Discover 2000+ OpenAPI Specifications
-  </text>
-  
-  <text x="600" y="420" font-family="Arial, sans-serif" font-size="32" fill="rgba(255,255,255,0.8)" text-anchor="middle">
+
+  <text x="600" y="340" font-family="Arial, sans-serif" font-size="38" fill="rgba(255,255,255,0.9)" text-anchor="middle">
     The world's largest catalog of public APIs
+  </text>
+
+  <text x="600" y="400" font-family="Arial, sans-serif" font-size="38" fill="rgba(255,255,255,0.9)" text-anchor="middle">
+    and Bruno Collections
   </text>
   
   <!-- URL -->
