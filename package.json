@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node -r dotenv/config index.js dotenv_config_path=.env.local",
-    "build": "bash railway-build.sh",
+    "preinstall": "bash railway-build.sh",
     "postinstall": "cd bruno-doc-gen && npm install --omit=dev"
   },
   "keywords": [
