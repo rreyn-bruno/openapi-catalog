@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "node index.js",
-    "postinstall": "cd bruno-doc-gen && npm install --production"
+    "dev": "node -r dotenv/config index.js dotenv_config_path=.env.local",
+    "postinstall": "cd bruno-doc-gen && npm install --omit=dev"
   },
   "keywords": [
     "bruno",
