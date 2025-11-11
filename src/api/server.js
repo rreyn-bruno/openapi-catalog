@@ -248,6 +248,43 @@ class CatalogServer {
       }
     });
 
+    // Dynamic sitemap.xml for SEO
+    this.app.get('/sitemap.xml', (req, res) => {
+      try {
+        const apis = this.db.getAllApis({ limit: 10000 });
+        const baseUrl = 'https://openapicatalog.com';
+
+        let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+        // Homepage
+        xml += '  <url>\n';
+        xml += `    <loc>${baseUrl}/</loc>\n`;
+        xml += '    <changefreq>daily</changefreq>\n';
+        xml += '    <priority>1.0</priority>\n';
+        xml += '  </url>\n';
+
+        // Each API's documentation page
+        apis.forEach(api => {
+          if (api.docs_path) {
+            xml += '  <url>\n';
+            xml += `    <loc>${baseUrl}/docs/${api.id}/index.html</loc>\n`;
+            xml += `    <lastmod>${api.updated_at || api.created_at}</lastmod>\n`;
+            xml += '    <changefreq>weekly</changefreq>\n';
+            xml += '    <priority>0.8</priority>\n';
+            xml += '  </url>\n';
+          }
+        });
+
+        xml += '</urlset>';
+
+        res.header('Content-Type', 'application/xml');
+        res.send(xml);
+      } catch (error) {
+        res.status(500).send('Error generating sitemap');
+      }
+    });
+
     // Regenerate documentation for all APIs
     this.app.post('/api/regenerate-docs', async (req, res) => {
       try {
