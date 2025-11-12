@@ -830,7 +830,7 @@
         const res = await fetch('/api/apis');
         const data = await res.json();
         allApis = data.apis;
-        renderApis(allApis);
+        filterApis(); // Use filterApis() to apply default sorting
       } catch (error) {
         console.error('Error loading APIs:', error);
         document.getElementById('content').innerHTML = `
