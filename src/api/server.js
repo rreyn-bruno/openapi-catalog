@@ -8,6 +8,7 @@ const CatalogDatabase = require('../database/schema');
 const GitHubScraper = require('../scraper/github-scraper');
 const ConversionPipeline = require('../pipeline/converter');
 const APIsGuruImporter = require('../scraper/apisguru-importer');
+const seo = require('../lib/seo');
 
 class CatalogServer {
   constructor(options = {}) {
@@ -40,12 +41,19 @@ class CatalogServer {
   }
 
   setupMiddleware() {
+    this.app.set('trust proxy', 1);
+    this.app.disable('x-powered-by');
     this.app.use(cors());
     this.app.use(express.json());
-    
-    // Serve static files (docs and frontend)
-    this.app.use('/docs', express.static(path.join(__dirname, '../../data/docs')));
-    this.app.use(express.static(path.join(__dirname, '../../public')));
+
+    // Canonical host: send www.* to the apex domain
+    this.app.use((req, res, next) => {
+      const host = req.hostname || '';
+      if (host.startsWith('www.')) {
+        return res.redirect(301, `https://${host.slice(4)}${req.originalUrl}`);
+      }
+      next();
+    });
     
     // Request logging
     this.app.use((req, res, next) => {
@@ -55,6 +63,9 @@ class CatalogServer {
   }
 
   setupRoutes() {
+    // Server-rendered HTML pages (registered first so they win over static files)
+    this.setupPageRoutes();
+
     // Health check
     this.app.get('/api/health', (req, res) => {
       res.json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -71,10 +82,11 @@ class CatalogServer {
           orderBy: orderBy || 'created_at DESC'
         });
         
-        // Add tags to each API
+        // Add tags to each API (single query instead of one per API)
+        const tagMap = this.db.getTagsForApis(apis.map(api => api.id));
         const apisWithTags = apis.map(api => ({
           ...api,
-          tags: this.db.getApiTags(api.id)
+          tags: tagMap.get(api.id) || []
         }));
         
         res.json({
@@ -188,7 +200,7 @@ class CatalogServer {
     this.app.get('/api/stats', (req, res) => {
       try {
         const stats = this.db.getStats();
-        res.json(stats);
+        res.json({ ...stats, totalTags: this.getCategories().length });
       } catch (error) {
         res.status(500).json({ error: error.message });
       }
@@ -248,43 +260,6 @@ class CatalogServer {
       }
     });
 
-    // Dynamic sitemap.xml for SEO
-    this.app.get('/sitemap.xml', (req, res) => {
-      try {
-        const apis = this.db.getAllApis({ limit: 10000 });
-        const baseUrl = 'https://openapicatalog.com';
-
-        let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-
-        // Homepage
-        xml += '  <url>\n';
-        xml += `    <loc>${baseUrl}/</loc>\n`;
-        xml += '    <changefreq>daily</changefreq>\n';
-        xml += '    <priority>1.0</priority>\n';
-        xml += '  </url>\n';
-
-        // Each API's documentation page
-        apis.forEach(api => {
-          if (api.docs_path) {
-            xml += '  <url>\n';
-            xml += `    <loc>${baseUrl}/docs/${api.id}/index.html</loc>\n`;
-            xml += `    <lastmod>${api.updated_at || api.created_at}</lastmod>\n`;
-            xml += '    <changefreq>weekly</changefreq>\n';
-            xml += '    <priority>0.8</priority>\n';
-            xml += '  </url>\n';
-          }
-        });
-
-        xml += '</urlset>';
-
-        res.header('Content-Type', 'application/xml');
-        res.send(xml);
-      } catch (error) {
-        res.status(500).send('Error generating sitemap');
-      }
-    });
-
     // Regenerate documentation for all APIs
     this.app.post('/api/regenerate-docs', async (req, res) => {
       try {
@@ -301,6 +276,273 @@ class CatalogServer {
       } catch (error) {
         res.status(500).json({ error: error.message });
       }
+    });
+
+    // Static assets and 404/500 handlers go last
+    this.setupStaticAndFallback();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Server-rendered pages (SEO / AEO)
+  // ---------------------------------------------------------------------------
+
+  publicPath(...parts) {
+    return path.join(__dirname, '../../public', ...parts);
+  }
+
+  dataPath(...parts) {
+    return path.join(__dirname, '../../data', ...parts);
+  }
+
+  /** Read a file from /public, cached by mtime. */
+  readTemplate(file) {
+    this.templateCache = this.templateCache || new Map();
+    const full = this.publicPath(file);
+    const stat = fs.statSync(full);
+    const cached = this.templateCache.get(full);
+    if (cached && cached.mtimeMs === stat.mtimeMs) return cached.html;
+    const html = fs.readFileSync(full, 'utf8');
+    this.templateCache.set(full, { mtimeMs: stat.mtimeMs, html });
+    return html;
+  }
+
+  /** Display categories (raw tags merged), cached for five minutes. */
+  getCategories() {
+    const now = Date.now();
+    if (!this.categoryCache || now - this.categoryCache.at > 5 * 60 * 1000) {
+      this.categoryCache = { at: now, categories: seo.buildCategories(this.db.getTagsWithCounts()) };
+    }
+    return this.categoryCache.categories;
+  }
+
+  findCategory(slug) {
+    return this.getCategories().find(c => c.slug === slug) || null;
+  }
+
+  /** Directory holding the generated docs for an API, or null. */
+  docsDirFor(api) {
+    const candidates = [api.docs_path, this.dataPath('docs', api.id)].filter(Boolean);
+    return candidates.find(dir => fs.existsSync(path.join(dir, 'index.html'))) || null;
+  }
+
+  sendPage(res, html, { maxAge = 600, status = 200 } = {}) {
+    res.status(status);
+    res.set('Content-Type', 'text/html; charset=utf-8');
+    res.set('Cache-Control', `public, max-age=${maxAge}, stale-while-revalidate=86400`);
+    res.send(html);
+  }
+
+  sendText(res, body, type, maxAge = 3600) {
+    res.set('Content-Type', type);
+    res.set('Cache-Control', `public, max-age=${maxAge}, stale-while-revalidate=86400`);
+    res.send(body);
+  }
+
+  sendNotFound(res) {
+    this.sendPage(res, seo.renderNotFound({ categories: this.getCategories() }), { status: 404, maxAge: 60 });
+  }
+
+  /** Minimal skeleton used when an API has no generated documentation yet. */
+  fallbackDocHtml() {
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+</head>
+<body>
+    <main class="page-content">
+        <div class="container-fluid">
+            <div class="row p-lg-4">
+                <article class="main-content col-md-12" id="doc-body">
+                    <p class="text-muted">Endpoint documentation has not been generated for this API yet. Download the Bruno collection or the OpenAPI spec above.</p>
+                </article>
+            </div>
+        </div>
+    </main>
+</body>
+</html>`;
+  }
+
+  setupPageRoutes() {
+    const app = this.app;
+
+    // Homepage: pre-rendered stats, category links and the most popular APIs
+    app.get('/', (req, res, next) => {
+      try {
+        const totalApis = this.db.getStats().totalApis;
+        const categories = this.getCategories();
+        const topApis = this.db.getTopApis(100);
+        const tagMap = this.db.getTagsForApis(topApis.map(a => a.id));
+        const html = seo.renderHome({ indexHtml: this.readTemplate('index.html'), totalApis, categories, topApis, tagMap });
+        this.sendPage(res, html);
+      } catch (error) {
+        next(error);
+      }
+    });
+    app.get('/index.html', (req, res) => res.redirect(301, '/'));
+
+    // About
+    app.get('/about', (req, res, next) => {
+      try {
+        const totalApis = this.db.getStats().totalApis;
+        const html = seo.renderAbout({ aboutHtml: this.readTemplate('about.html'), totalApis, categories: this.getCategories() });
+        this.sendPage(res, html, { maxAge: 3600 });
+      } catch (error) {
+        next(error);
+      }
+    });
+    app.get('/about.html', (req, res) => res.redirect(301, '/about'));
+
+    // Category index and category pages
+    app.get('/categories', (req, res, next) => {
+      try {
+        const totalApis = this.db.getStats().totalApis;
+        this.sendPage(res, seo.renderCategoriesIndex({ categories: this.getCategories(), totalApis }), { maxAge: 3600 });
+      } catch (error) {
+        next(error);
+      }
+    });
+
+    app.get('/category/:slug', (req, res, next) => {
+      try {
+        const category = this.findCategory(req.params.slug);
+        if (!category) return this.sendNotFound(res);
+        const apis = this.db.getApisByTagIds(category.tagIds);
+        const tagMap = this.db.getTagsForApis(apis.map(a => a.id));
+        const totalApis = this.db.getStats().totalApis;
+        const html = seo.renderCategoryPage({ category, apis, tagMap, categories: this.getCategories(), totalApis });
+        this.sendPage(res, html, { maxAge: 3600 });
+      } catch (error) {
+        next(error);
+      }
+    });
+
+    // Raw OpenAPI document for an API
+    app.get('/apis/:slug/openapi.json', (req, res, next) => {
+      try {
+        const api = this.db.getApiBySlug(req.params.slug);
+        if (!api) return res.status(404).json({ error: 'API not found' });
+        const file = this.dataPath('openapi', `${api.id}.json`);
+        if (!fs.existsSync(file)) return res.status(404).json({ error: 'OpenAPI document not available' });
+        res.set('Cache-Control', 'public, max-age=86400');
+        res.set('X-Robots-Tag', 'noindex');
+        res.type('application/json');
+        res.sendFile(file);
+      } catch (error) {
+        next(error);
+      }
+    });
+
+    // API documentation page (generated docs wrapped with SEO metadata and a summary)
+    app.get('/apis/:slug', (req, res, next) => {
+      try {
+        let api = this.db.getApiBySlug(req.params.slug);
+        if (!api) {
+          const byId = this.db.getApi(req.params.slug);
+          if (byId && byId.slug) return res.redirect(301, `/apis/${byId.slug}`);
+          return this.sendNotFound(res);
+        }
+
+        const docsDir = this.docsDirFor(api);
+        const html = docsDir ? fs.readFileSync(path.join(docsDir, 'index.html'), 'utf8') : this.fallbackDocHtml();
+        const tags = this.db.getApiTags(api.id);
+        // Related APIs, de-duplicated by name (the catalog holds several copies of some specs)
+        const seenNames = new Set([String(api.name || '').toLowerCase()]);
+        const related = this.db.getRelatedApis(api.id, 18)
+          .filter(r => {
+            const key = String(r.name || '').toLowerCase();
+            if (seenNames.has(key)) return false;
+            seenNames.add(key);
+            return true;
+          })
+          .slice(0, 6);
+        const facts = seo.specFacts(api.id, this.dataPath('openapi'));
+        const isDuplicate = this.db.countApisByName(api.name) > 1;
+
+        const page = seo.renderApiPage({ html, api, tags, related, facts, categories: this.getCategories(), isDuplicate });
+        this.sendPage(res, page, { maxAge: 3600 });
+      } catch (error) {
+        next(error);
+      }
+    });
+
+    // Legacy doc URLs redirect to the canonical slug URL. Assets under
+    // /docs/:id/assets/* are still served statically.
+    app.get(['/docs/:id', '/docs/:id/index.html'], (req, res, next) => {
+      const api = this.db.getApi(req.params.id);
+      if (api && api.slug) return res.redirect(301, `/apis/${api.slug}`);
+      next();
+    });
+
+    // llms.txt: concise, answer-engine friendly overview
+    app.get('/llms.txt', (req, res, next) => {
+      try {
+        const totalApis = this.db.getStats().totalApis;
+        const body = seo.renderLlmsTxt({ totalApis, categories: this.getCategories(), topApis: this.db.getTopApis(50) });
+        this.sendText(res, body, 'text/plain; charset=utf-8');
+      } catch (error) {
+        next(error);
+      }
+    });
+
+    app.get('/llms-full.txt', (req, res, next) => {
+      try {
+        const categories = this.getCategories();
+        const apis = this.db.getAllApis({ limit: 100000, orderBy: 'stars DESC, name ASC' });
+        const tagMap = this.db.getTagsForApis(apis.map(a => a.id));
+        const bySlug = new Map();
+        const uncategorized = [];
+        for (const api of apis) {
+          const slugs = new Set((tagMap.get(api.id) || []).map(t => seo.categorySlug(seo.displayTagName(t.name))).filter(Boolean));
+          if (slugs.size === 0) uncategorized.push(api);
+          for (const slug of slugs) {
+            if (!bySlug.has(slug)) bySlug.set(slug, []);
+            bySlug.get(slug).push(api);
+          }
+        }
+        const body = seo.renderLlmsFullTxt({ totalApis: apis.length, categories, apisByCategory: bySlug, uncategorized });
+        this.sendText(res, body, 'text/plain; charset=utf-8');
+      } catch (error) {
+        next(error);
+      }
+    });
+
+    // Sitemap (ISO 8601 lastmod, canonical slug URLs, category pages)
+    app.get('/sitemap.xml', (req, res, next) => {
+      try {
+        const apis = this.db.getAllApis({ limit: 100000, orderBy: 'stars DESC, name ASC' });
+        const xml = seo.renderSitemap({ apis, categories: this.getCategories() });
+        this.sendText(res, xml, 'application/xml; charset=utf-8');
+      } catch (error) {
+        next(error);
+      }
+    });
+  }
+
+  setupStaticAndFallback() {
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    // Generated documentation assets (the index.html pages themselves are served via /apis/:slug)
+    this.app.use('/docs', express.static(this.dataPath('docs'), { maxAge: 7 * oneDay, index: false, redirect: false }));
+
+    // Frontend assets. index.html / about.html are rendered by routes above.
+    this.app.use(express.static(this.publicPath(), { maxAge: oneDay, index: false, redirect: false }));
+
+    // 404
+    this.app.use((req, res) => {
+      if (req.path.startsWith('/api/')) return res.status(404).json({ error: 'Not found' });
+      this.sendNotFound(res);
+    });
+
+    // 500
+    // eslint-disable-next-line no-unused-vars
+    this.app.use((err, req, res, next) => {
+      console.error('Unhandled error:', err);
+      if (req.path.startsWith('/api/')) return res.status(500).json({ error: err.message });
+      res.status(500).set('Content-Type', 'text/plain').send('Internal server error');
     });
   }
 

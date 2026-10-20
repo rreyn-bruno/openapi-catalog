@@ -96,6 +96,24 @@ bruno-api-catalog/
 └── package.json
 ```
 
+## Pages (server-rendered)
+
+HTML pages are rendered by Express with SEO/AEO metadata (meta description, canonical,
+Open Graph, schema.org JSON-LD) and are safe to crawl without JavaScript.
+
+| Route | Description |
+|-------|-------------|
+| `/` | Homepage with pre-rendered stats, category links and the 100 most-starred APIs (JavaScript then loads the full list). Supports `?search=` and `?category=`. |
+| `/apis/:slug` | API documentation page: generated docs wrapped with a summary (endpoints, base URL, auth, source, categories), breadcrumbs, related APIs and structured data. |
+| `/apis/:slug/openapi.json` | Raw OpenAPI document for the API. |
+| `/categories`, `/category/:slug` | Category index and per-category listings. |
+| `/about` | About page with FAQ (FAQPage schema). |
+| `/sitemap.xml`, `/robots.txt` | Crawl directives. `lastmod` is ISO 8601. |
+| `/llms.txt`, `/llms-full.txt` | Machine-readable overview / full index for AI assistants. |
+
+Legacy URLs (`/docs/:id/index.html`, `/about.html`, `/index.html`) return 301 redirects to
+the canonical pages. Slugs are assigned once per API at startup (`apis.slug`) and never change.
+
 ## API Endpoints
 
 ### GET /api/apis

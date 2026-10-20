@@ -1,6 +1,7 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
+const { slugCandidates } = require('../lib/slug');
 
 class CatalogDatabase {
   constructor(dbPath = './data/catalog.db') {
@@ -52,6 +53,11 @@ class CatalogDatabase {
     } catch (e) {
       // Column already exists, ignore
     }
+    try {
+      this.db.exec(`ALTER TABLE apis ADD COLUMN slug TEXT`);
+    } catch (e) {
+      // Column already exists, ignore
+    }
 
     // Tags table
     this.db.exec(`
@@ -90,14 +96,65 @@ class CatalogDatabase {
       CREATE INDEX IF NOT EXISTS idx_apis_stars ON apis(stars DESC);
       CREATE INDEX IF NOT EXISTS idx_apis_created ON apis(created_at DESC);
     `);
+
+    // Human-readable, stable URL slugs (used for /apis/:slug pages)
+    this.backfillSlugs();
+    this.db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_apis_slug ON apis(slug)`);
+  }
+
+  slugExists(slug) {
+    const row = this.db.prepare('SELECT 1 FROM apis WHERE slug = ?').get(slug);
+    return !!row;
+  }
+
+  /**
+   * Pick the most readable slug for an API that is not already in use.
+   * `taken` is an optional in-memory set used during bulk backfills.
+   */
+  uniqueSlugFor(api, taken = new Set()) {
+    const candidates = slugCandidates(api);
+    for (const candidate of candidates) {
+      if (!taken.has(candidate) && !this.slugExists(candidate)) {
+        return candidate;
+      }
+    }
+    const last = candidates[candidates.length - 1];
+    let n = 2;
+    while (taken.has(`${last}-${n}`) || this.slugExists(`${last}-${n}`)) n++;
+    return `${last}-${n}`;
+  }
+
+  backfillSlugs() {
+    const rows = this.db.prepare(`
+      SELECT id, name, version, github_url, source_url, openapi_url
+      FROM apis
+      WHERE slug IS NULL OR slug = ''
+      ORDER BY stars DESC, created_at ASC
+    `).all();
+    if (rows.length === 0) return;
+
+    const taken = new Set(
+      this.db.prepare('SELECT slug FROM apis WHERE slug IS NOT NULL').all().map(r => r.slug)
+    );
+    const update = this.db.prepare('UPDATE apis SET slug = ? WHERE id = ?');
+    const run = this.db.transaction(list => {
+      for (const row of list) {
+        const slug = this.uniqueSlugFor(row, taken);
+        taken.add(slug);
+        update.run(slug, row.id);
+      }
+    });
+    run(rows);
+    console.log(`✓ Assigned URL slugs to ${rows.length} API(s)`);
   }
 
   // API operations
   createApi(api) {
     const stmt = this.db.prepare(`
-      INSERT INTO apis (id, name, description, version, github_url, openapi_url, collection_path, docs_path, stars, source, source_url, last_synced_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO apis (id, name, description, version, github_url, openapi_url, collection_path, docs_path, stars, source, source_url, last_synced_at, slug)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
+    const slug = api.slug || this.uniqueSlugFor(api);
     return stmt.run(
       api.id,
       api.name,
@@ -110,7 +167,8 @@ class CatalogDatabase {
       api.stars || 0,
       api.source || 'github-scrape',
       api.source_url || null,
-      api.last_synced_at || new Date().toISOString()
+      api.last_synced_at || new Date().toISOString(),
+      slug
     );
   }
 
@@ -235,6 +293,80 @@ class CatalogDatabase {
   getLatestScrapeRun() {
     const stmt = this.db.prepare('SELECT * FROM scrape_runs ORDER BY started_at DESC LIMIT 1');
     return stmt.get();
+  }
+
+  // Page-rendering helpers
+  getApiBySlug(slug) {
+    const stmt = this.db.prepare('SELECT * FROM apis WHERE slug = ?');
+    return stmt.get(slug);
+  }
+
+  countApisByName(name) {
+    const stmt = this.db.prepare('SELECT COUNT(*) as count FROM apis WHERE name = ?');
+    return stmt.get(name).count;
+  }
+
+  getTopApis(limit = 100) {
+    const stmt = this.db.prepare('SELECT * FROM apis ORDER BY stars DESC, name ASC LIMIT ?');
+    return stmt.all(limit);
+  }
+
+  getTagsWithCounts() {
+    const stmt = this.db.prepare(`
+      SELECT t.id, t.name, COUNT(at.api_id) as count
+      FROM tags t
+      LEFT JOIN api_tags at ON at.tag_id = t.id
+      GROUP BY t.id
+      ORDER BY count DESC, t.name ASC
+    `);
+    return stmt.all();
+  }
+
+  getApisByTagIds(tagIds) {
+    if (!tagIds || tagIds.length === 0) return [];
+    const placeholders = tagIds.map(() => '?').join(',');
+    const stmt = this.db.prepare(`
+      SELECT DISTINCT a.* FROM apis a
+      JOIN api_tags at ON a.id = at.api_id
+      WHERE at.tag_id IN (${placeholders})
+      ORDER BY a.stars DESC, a.name ASC
+    `);
+    return stmt.all(...tagIds);
+  }
+
+  getRelatedApis(apiId, limit = 6) {
+    const stmt = this.db.prepare(`
+      SELECT a.*, COUNT(*) as shared_tags FROM apis a
+      JOIN api_tags at ON a.id = at.api_id
+      WHERE at.tag_id IN (SELECT tag_id FROM api_tags WHERE api_id = ?)
+        AND a.id != ?
+      GROUP BY a.id
+      ORDER BY shared_tags DESC, a.stars DESC
+      LIMIT ?
+    `);
+    return stmt.all(apiId, apiId, limit);
+  }
+
+  /**
+   * Tags for many APIs in one query. Returns a Map of apiId -> [{id, name}].
+   */
+  getTagsForApis(apiIds) {
+    const map = new Map();
+    const ids = [...new Set(apiIds)];
+    for (let i = 0; i < ids.length; i += 500) {
+      const chunk = ids.slice(i, i + 500);
+      const placeholders = chunk.map(() => '?').join(',');
+      const rows = this.db.prepare(`
+        SELECT at.api_id, t.id, t.name FROM api_tags at
+        JOIN tags t ON t.id = at.tag_id
+        WHERE at.api_id IN (${placeholders})
+      `).all(...chunk);
+      for (const row of rows) {
+        if (!map.has(row.api_id)) map.set(row.api_id, []);
+        map.get(row.api_id).push({ id: row.id, name: row.name });
+      }
+    }
+    return map;
   }
 
   // Stats

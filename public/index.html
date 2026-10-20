@@ -15,30 +15,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Primary Meta Tags -->
-  <title>Bruno API Catalog - Discover 2000+ OpenAPI Specifications</title>
-  <meta name="title" content="Bruno API Catalog - Discover 2000+ OpenAPI Specifications">
-  <meta name="description" content="The world's largest catalog of public OpenAPI specifications. Browse 2000+ APIs from GitHub and APIs.guru, ready to import into Bruno API client. Free and open source.">
+  <title>OpenAPI Catalog – Public API Specs, Docs & Bruno Collections</title>
+  <meta name="title" content="OpenAPI Catalog – Public API Specs, Docs & Bruno Collections">
+  <meta name="description" content="The largest catalog of public OpenAPI specifications. Browse thousands of REST APIs from GitHub and APIs.guru with interactive docs and ready-to-import Bruno collections. Free and open source.">
   <meta name="keywords" content="OpenAPI, Swagger, API catalog, Bruno, REST API, API documentation, API specifications, OpenAPI 3.0, API discovery, public APIs">
-  <meta name="author" content="Bruno API Catalog">
-  <meta name="robots" content="index, follow">
+  <meta name="author" content="OpenAPI Catalog">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   <link rel="canonical" href="https://openapicatalog.com/">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://openapicatalog.com/">
-  <meta property="og:title" content="Bruno API Catalog - Discover 2000+ OpenAPI Specifications">
-  <meta property="og:description" content="The world's largest catalog of public OpenAPI specifications. Browse 2000+ APIs from GitHub and APIs.guru, ready to import into Bruno API client.">
-  <meta property="og:image" content="https://openapicatalog.com/og-image.svg">
+  <meta property="og:title" content="OpenAPI Catalog – Public API Specs, Docs & Bruno Collections">
+  <meta property="og:description" content="The largest catalog of public OpenAPI specifications. Thousands of REST APIs with interactive docs and ready-to-import Bruno collections.">
+  <meta property="og:image" content="https://openapicatalog.com/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:alt" content="OpenAPI Catalog – the largest catalog of public APIs and Bruno collections">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:site_name" content="Bruno API Catalog">
+  <meta property="og:site_name" content="OpenAPI Catalog">
 
   <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://openapicatalog.com/">
-  <meta property="twitter:title" content="Bruno API Catalog - Discover 2000+ OpenAPI Specifications">
-  <meta property="twitter:description" content="The world's largest catalog of public OpenAPI specifications. Browse 2000+ APIs from GitHub and APIs.guru, ready to import into Bruno API client.">
-  <meta property="twitter:image" content="https://openapicatalog.com/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://openapicatalog.com/">
+  <meta name="twitter:title" content="OpenAPI Catalog – Public API Specs, Docs & Bruno Collections">
+  <meta name="twitter:description" content="The largest catalog of public OpenAPI specifications. Thousands of REST APIs with interactive docs and ready-to-import Bruno collections.">
+  <meta name="twitter:image" content="https://openapicatalog.com/og-image.png">
 
   <!-- Theme Color -->
   <meta name="theme-color" content="#3b82f6">
@@ -56,25 +58,23 @@
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Bruno API Catalog",
+    "@id": "https://openapicatalog.com/#website",
+    "name": "OpenAPI Catalog",
+    "alternateName": "Bruno API Catalog",
     "url": "https://openapicatalog.com/",
-    "description": "The world's largest catalog of public OpenAPI specifications",
+    "description": "The largest catalog of public OpenAPI specifications, each with interactive docs and a Bruno collection.",
+    "inLanguage": "en",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://openapicatalog.com/?search={search_term_string}",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://openapicatalog.com/?search={search_term_string}"
+      },
       "query-input": "required name=search_term_string"
     }
   }
   </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "OpenAPI Specifications Catalog",
-    "description": "A comprehensive catalog of public OpenAPI specifications",
-    "numberOfItems": "2000+"
-  }
-  </script>
+  <!--SSR:ITEMLIST--><!--/SSR:ITEMLIST-->
   <style>
     :root {
       --primary: #3b82f6;
@@ -616,6 +616,14 @@
         font-size: 0.75rem;
       }
     }
+    a.filter-tag { text-decoration: none; color: inherit; }
+    .api-name a { color: inherit; text-decoration: none; }
+    .api-name a:hover { color: var(--primary); }
+    .header-intro { margin-top: 0.75rem; max-width: 60ch; opacity: 0.9; font-size: 0.95rem; }
+    .header-intro a { color: inherit; text-decoration: underline; }
+    .footer-categories { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem 0.9rem; margin: 1rem auto 0; font-size: 0.8rem; max-width: 900px; }
+    .footer-categories a { color: inherit; opacity: 0.85; text-decoration: none; }
+    .footer-categories a:hover { opacity: 1; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -627,6 +635,7 @@
             <span>OpenAPI Catalog</span>
           </h1>
           <p class="subtitle">Explore the <strong>largest</strong> OpenAPI-backed API Catalog - complete with Bruno Collections.</p>
+          <p class="header-intro"><span data-ssr="count">Thousands of</span> public APIs collected from GitHub and APIs.guru. Every entry has an OpenAPI spec, generated endpoint docs, and a Bruno collection you can open locally. <a href="/categories">Browse by category</a> or <a href="/about">see how it works</a>.</p>
         </div>
         <div class="header-stats">
           <div class="header-stat">
@@ -675,20 +684,17 @@
       </div>
     </div>
 
-    <div id="content">
-      <div class="loading">
-        <div class="loading-spinner"></div>
-        <p>Loading APIs...</p>
-      </div>
-    </div>
+    <div id="content"><!--SSR:CONTENT--></div>
   </div>
 
   <footer>
     <div class="container">
       <p>Built for the <a href="https://www.usebruno.com/" target="_blank">Bruno</a> API client community</p>
       <p style="margin-top: 0.5rem; opacity: 0.8; font-size: 0.875rem;">
-        Powered by OpenAPI specifications from GitHub
+        Powered by OpenAPI specifications from GitHub and APIs.guru ·
+        <a href="/about">About</a> · <a href="/categories">Categories</a> · <a href="/llms.txt">llms.txt</a>
       </p>
+      <!--SSR:CATEGORIES-->
     </div>
   </footer>
 
@@ -710,15 +716,25 @@
       }
     }
 
-    // Load tags for filtering
+    // Load tags for filtering (raw tags are merged into display categories)
     async function loadTags() {
       try {
         const res = await fetch('/api/tags');
         const data = await res.json();
         // Handle both array and object response
-        allTags = Array.isArray(data) ? data : (data.tags || []);
+        const rawTags = Array.isArray(data) ? data : (data.tags || []);
+        const merged = new Map();
+        rawTags.forEach(tag => {
+          if (!tag.name || tag.name.trim().length < 2) return;
+          const name = normalizeTagName(tag.name);
+          const entry = merged.get(name) || { name, count: 0 };
+          entry.count += tag.count || 0;
+          merged.set(name, entry);
+        });
+        allTags = [...merged.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
         renderFilterTags();
         populateCategoryDropdown();
+        if (activeFilter) document.getElementById('categoryFilter').value = activeFilter;
       } catch (error) {
         console.error('Error loading tags:', error);
       }
@@ -745,12 +761,31 @@
         return;
       }
 
-      const topTags = allTags.slice(0, 10); // Show top 10 tags
+      const topTags = allTags.slice(0, 12); // Show top 12 tags
       container.innerHTML = topTags.map(tag => `
-        <div class="filter-tag" onclick="toggleFilter('${tag.name}')">
-          ${normalizeTagName(tag.name)}${tag.count ? ` (${tag.count})` : ''}
-        </div>
+        <a class="filter-tag${activeFilter && normalizeTagName(activeFilter) === tag.name ? ' active' : ''}" href="/category/${slugifyCategory(tag.name)}" data-category="${escapeHtml(tag.name)}" onclick="toggleFilter(this.dataset.category); return false;">
+          ${escapeHtml(tag.name)}${tag.count ? ` (${tag.count})` : ''}
+        </a>
       `).join('');
+    }
+
+    function slugifyCategory(name) {
+      return String(name || '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Keep the URL shareable (?search=&category=) without reloading
+    function syncUrl() {
+      const params = new URLSearchParams();
+      const q = document.getElementById('searchInput').value.trim();
+      if (q) params.set('search', q);
+      if (activeFilter) params.set('category', activeFilter);
+      const qs = params.toString();
+      history.replaceState(null, '', qs ? `/?${qs}` : '/');
     }
 
     // Toggle filter
@@ -763,12 +798,9 @@
 
       // Update UI
       document.querySelectorAll('.filter-tag').forEach(el => {
-        if (el.textContent.startsWith(tagName)) {
-          el.classList.toggle('active');
-        } else {
-          el.classList.remove('active');
-        }
+        el.classList.toggle('active', !!activeFilter && el.dataset.category === activeFilter);
       });
+      document.getElementById('categoryFilter').value = activeFilter || '';
 
       // Filter APIs
       filterApis();
@@ -814,6 +846,7 @@
       }
 
       renderApis(filtered);
+      syncUrl();
     }
 
     // Debounced search function
@@ -844,25 +877,37 @@
 
     // Normalize tag names for display
     function normalizeTagName(tagName) {
+      // Keep in sync with TAG_DISPLAY in src/lib/seo.js
       const tagMap = {
         'cloud': 'Cloud & Infrastructure',
+        'cloud & infrastructure': 'Cloud & Infrastructure',
         'backend': 'Backend & Infrastructure',
         'developer_tools': 'Developer Tools',
+        'developer tools': 'Developer Tools',
+        'tools': 'Developer Tools',
         'customer_relation': 'Customer Relations',
-        'ecommerce': 'eCommerce',
-        'machine_learning': 'Machine Learning',
+        'ecommerce': 'E-commerce',
+        'e-commerce': 'E-commerce',
+        'machine_learning': 'AI & ML',
+        'ai & ml': 'AI & ML',
         'open_data': 'Open Data',
         'payment': 'Payments',
+        'payments': 'Payments',
+        'financial': 'Finance',
+        'finance': 'Finance',
         'project_management': 'Project Management',
         'time_management': 'Time Management',
         'social': 'Social Media',
+        'social media': 'Social Media',
         'storage': 'Storage & Data',
         'telecom': 'Telecommunications',
-        'transport': 'Transportation'
+        'transport': 'Transportation',
+        'iot': 'IoT',
+        'monitoring': 'Analytics'
       };
 
       const normalized = tagMap[tagName.toLowerCase()];
-      return normalized || tagName.charAt(0).toUpperCase() + tagName.slice(1);
+      return normalized || tagName.charAt(0).toUpperCase() + tagName.slice(1).replace(/_/g, ' ');
     }
 
     // Render APIs
@@ -901,13 +946,15 @@
             </thead>
             <tbody>
               ${apis.map(api => {
+                const seenTags = new Set();
                 const tags = api.tags && api.tags.length > 0
-                  ? api.tags.slice(0, 3).map(tag => {
-                      const tagName = typeof tag === 'string' ? tag : tag.name;
-                      const displayName = normalizeTagName(tagName);
-                      return `<span class="tag">${displayName}</span>`;
-                    }).join('')
+                  ? api.tags.map(tag => normalizeTagName(typeof tag === 'string' ? tag : tag.name))
+                      .filter(name => name && !seenTags.has(name) && seenTags.add(name))
+                      .slice(0, 3)
+                      .map(displayName => `<a class="tag" href="/category/${slugifyCategory(displayName)}">${escapeHtml(displayName)}</a>`)
+                      .join('')
                   : '<span class="tag">Uncategorized</span>';
+                const docsUrl = api.slug ? `/apis/${api.slug}` : `/docs/${api.id}/index.html`;
 
                 // Determine source link
                 const sourceUrl = api.github_url || api.source_url;
@@ -917,8 +964,8 @@
                 return `
                   <tr>
                     <td>
-                      <div class="api-name">${api.name || 'Unnamed API'}</div>
-                      <div class="api-description">${api.description || 'No description available'}</div>
+                      <div class="api-name"><a href="${docsUrl}">${escapeHtml(api.name || 'Unnamed API')}</a></div>
+                      <div class="api-description">${escapeHtml(api.description || 'No description available')}</div>
                     </td>
                     <td>
                       <div class="api-tags">${tags}</div>
@@ -932,7 +979,7 @@
                           <img src="/bruno-logo.png" alt="Bruno" style="height: 14px; width: auto; vertical-align: middle; margin-right: 4px;">
                           Bruno
                         </a>
-                        <a href="/docs/${api.id}/index.html" class="btn btn-secondary" target="_blank">
+                        <a href="${docsUrl}" class="btn btn-secondary">
                           <span style="font-size: 14px; vertical-align: middle; margin-right: 4px;">📚</span>
                           Docs
                         </a>
@@ -979,19 +1026,22 @@
 
         // Update filter tag UI
         document.querySelectorAll('.filter-tag').forEach(el => {
-          el.classList.remove('active');
+          el.classList.toggle('active', !!activeFilter && el.dataset.category === activeFilter);
         });
-
-        if (activeFilter) {
-          document.querySelectorAll('.filter-tag').forEach(el => {
-            if (el.textContent.startsWith(activeFilter)) {
-              el.classList.add('active');
-            }
-          });
-        }
 
         filterApis();
       });
+
+      // Honour ?search= and ?category= (used by the sitelinks SearchAction and shared links)
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('search')) searchInput.value = params.get('search');
+      if (params.get('category')) {
+        activeFilter = normalizeTagName(params.get('category'));
+        document.querySelectorAll('.filter-tag').forEach(el => {
+          el.classList.toggle('active', el.dataset.category === activeFilter);
+        });
+        document.getElementById('categoryFilter').value = activeFilter;
+      }
 
       // Initialize
       loadStats();

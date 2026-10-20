@@ -3,7 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About - Bruno API Catalog</title>
+  <title>About OpenAPI Catalog – How We Collect Public API Specs</title>
+  <meta name="description" content="How OpenAPI Catalog discovers public OpenAPI specifications on GitHub and APIs.guru, converts each one to a Bruno collection, generates docs, and answers common questions.">
+  <link rel="canonical" href="https://openapicatalog.com/about">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="OpenAPI Catalog">
+  <meta property="og:url" content="https://openapicatalog.com/about">
+  <meta property="og:title" content="About OpenAPI Catalog – How We Collect Public API Specs">
+  <meta property="og:description" content="How OpenAPI Catalog discovers public OpenAPI specifications, converts each one to a Bruno collection, and generates docs.">
+  <meta property="og:image" content="https://openapicatalog.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="About OpenAPI Catalog – How We Collect Public API Specs">
+  <meta name="twitter:description" content="How OpenAPI Catalog discovers public OpenAPI specifications, converts each one to a Bruno collection, and generates docs.">
+  <meta name="twitter:image" content="https://openapicatalog.com/og-image.png">
+  <meta name="theme-color" content="#3b82f6">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "AboutPage", "@id": "https://openapicatalog.com/about", "url": "https://openapicatalog.com/about", "name": "About OpenAPI Catalog", "isPartOf": {"@id": "https://openapicatalog.com/#website"}, "description": "How OpenAPI Catalog collects public OpenAPI specifications from GitHub and APIs.guru, converts them to Bruno collections, and generates documentation."}, {"@type": "Organization", "@id": "https://openapicatalog.com/#organization", "name": "OpenAPI Catalog", "url": "https://openapicatalog.com/", "logo": "https://openapicatalog.com/apple-touch-icon.png"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "OpenAPI Catalog", "item": "https://openapicatalog.com/"}, {"@type": "ListItem", "position": 2, "name": "About", "item": "https://openapicatalog.com/about"}]}]}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is OpenAPI Catalog?", "acceptedAnswer": {"@type": "Answer", "text": "OpenAPI Catalog is a free, open-source directory of public OpenAPI and Swagger specifications. It collects specs from GitHub repositories and the APIs.guru directory, generates interactive endpoint documentation from each one, and packages every API as a Bruno collection you can open in the Bruno API client."}}, {"@type": "Question", "name": "Where do the API specifications come from?", "acceptedAnswer": {"@type": "Answer", "text": "Specs come from two sources: a scraper that searches public GitHub repositories for openapi.json, openapi.yaml and swagger.json files, and a sync with the APIs.guru directory of official API descriptions. Each API page links back to its original source so you can verify it."}}, {"@type": "Question", "name": "What is a Bruno collection and how do I import one?", "acceptedAnswer": {"@type": "Answer", "text": "Bruno is an open-source, Git-friendly API client that stores collections as plain files on disk. To use an API from this catalog, download its collection ZIP, unzip it, open Bruno, choose Open Collection, and select the folder. Then set the baseUrl variable and any credentials and start sending requests."}}, {"@type": "Question", "name": "Can I get the raw OpenAPI file for an API?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Every API page has an OpenAPI spec (JSON) link, and the same document is available by appending /openapi.json to the API's URL, for example https://openapicatalog.com/apis/your-api/openapi.json."}}, {"@type": "Question", "name": "Are the APIs free to use?", "acceptedAnswer": {"@type": "Answer", "text": "The catalog itself is free. Each API is owned by its provider and has its own terms, pricing, and authentication requirements. The Source link on every API page points to the provider or repository where those terms are published."}}, {"@type": "Question", "name": "How are APIs categorized?", "acceptedAnswer": {"@type": "Answer", "text": "Each API is tagged with one or more categories such as Cloud & Infrastructure, Payments, or Developer Tools, based on metadata from APIs.guru and keywords in the spec and repository. Category pages list every API on a topic, ranked by GitHub stars."}}, {"@type": "Question", "name": "Is there a machine-readable index for AI assistants and crawlers?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. /llms.txt gives a short overview with category links and popular APIs, /llms-full.txt lists every API with a one-line description, and /sitemap.xml lists every page. The site also publishes schema.org structured data on every API and category page."}}]}</script>
   <style>
     :root {
       --primary: #3b82f6;
@@ -210,6 +231,9 @@
         font-size: 1.5rem;
       }
     }
+    .faq-item { margin-bottom: 1.5rem; }
+    .faq-item h3 { margin-bottom: 0.4rem; }
+    .faq-item p { margin: 0; }
   </style>
 </head>
 <body>
@@ -232,7 +256,7 @@
 
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-value" id="totalApis">~2,900</div>
+          <div class="stat-value" id="totalApis">3,000+</div>
           <div class="stat-label">OpenAPI Specifications</div>
         </div>
         <div class="stat-card">
@@ -253,7 +277,7 @@
         <li><strong>Bruno Collection</strong> - Ready to download and import into Bruno</li>
         <li><strong>Interactive Documentation</strong> - Auto-generated HTML docs for easy exploration</li>
         <li><strong>Source Information</strong> - Links to original GitHub repos or official sources</li>
-        <li><strong>Categorization</strong> - Organized by tags for easy discovery</li>
+        <li><strong>Categorization</strong> - Organized into <a href="/categories" style="color: var(--primary);">categories</a> for easy discovery</li>
       </ul>
 
       <h2>Data Sources</h2>
@@ -264,7 +288,7 @@
         Our custom scraper searches GitHub for public repositories containing OpenAPI specifications (<code>openapi.json</code>, <code>openapi.yaml</code>, <code>swagger.json</code>, etc.). This gives us:
       </p>
       <ul>
-        <li><strong>~400+ APIs</strong> from community projects and open-source tools</li>
+        <li><strong>Hundreds of APIs</strong> from community projects and open-source tools</li>
         <li><strong>Star counts</strong> as a quality signal</li>
         <li><strong>Direct GitHub links</strong> to the source repositories</li>
         <li><strong>Automatic categorization</strong> based on keywords and repo metadata</li>
@@ -275,7 +299,7 @@
         We import the comprehensive <a href="https://apis.guru" target="_blank" style="color: var(--primary);">APIs.guru</a> catalog, which includes:
       </p>
       <ul>
-        <li><strong>~2,500+ APIs</strong> from 677+ providers</li>
+        <li><strong>Thousands of APIs</strong> from hundreds of providers</li>
         <li><strong>Official APIs</strong> from AWS, Azure, Google Cloud, Stripe, Twilio, and more</li>
         <li><strong>Well-maintained specs</strong> with regular updates</li>
         <li><strong>Rich metadata</strong> including categories, logos, and provider information</li>
@@ -312,8 +336,38 @@
 
       <h2>Get Started</h2>
       <p>
-        Browse the catalog, find an API you're interested in, and click the <strong>Bruno</strong> button to download the collection as a ZIP file. Extract it and open it in Bruno to start making requests immediately!
+        <a href="/" style="color: var(--primary);">Browse the catalog</a>, find an API you're interested in, and click the <strong>Bruno</strong> button to download the collection as a ZIP file. Extract it and open it in Bruno to start making requests immediately!
       </p>
+
+      <h2 id="faq">Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <h3>What is OpenAPI Catalog?</h3>
+        <p>OpenAPI Catalog is a free, open-source directory of public OpenAPI and Swagger specifications. It collects specs from GitHub repositories and the APIs.guru directory, generates interactive endpoint documentation from each one, and packages every API as a Bruno collection you can open in the Bruno API client.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Where do the API specifications come from?</h3>
+        <p>Specs come from two sources: a scraper that searches public GitHub repositories for openapi.json, openapi.yaml and swagger.json files, and a sync with the APIs.guru directory of official API descriptions. Each API page links back to its original source so you can verify it.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What is a Bruno collection and how do I import one?</h3>
+        <p>Bruno is an open-source, Git-friendly API client that stores collections as plain files on disk. To use an API from this catalog, download its collection ZIP, unzip it, open Bruno, choose Open Collection, and select the folder. Then set the baseUrl variable and any credentials and start sending requests.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Can I get the raw OpenAPI file for an API?</h3>
+        <p>Yes. Every API page has an OpenAPI spec (JSON) link, and the same document is available by appending /openapi.json to the API's URL, for example <code>https://openapicatalog.com/apis/your-api/openapi.json</code>.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Are the APIs free to use?</h3>
+        <p>The catalog itself is free. Each API is owned by its provider and has its own terms, pricing, and authentication requirements. The Source link on every API page points to the provider or repository where those terms are published.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How are APIs categorized?</h3>
+        <p>Each API is tagged with one or more categories such as Cloud &amp; Infrastructure, Payments, or Developer Tools, based on metadata from APIs.guru and keywords in the spec and repository. Category pages list every API on a topic, ranked by GitHub stars.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Is there a machine-readable index for AI assistants and crawlers?</h3>
+        <p>Yes. <a href="/llms.txt">/llms.txt</a> gives a short overview with category links and popular APIs, <a href="/llms-full.txt">/llms-full.txt</a> lists every API with a one-line description, and <a href="/sitemap.xml">/sitemap.xml</a> lists every page. The site also publishes schema.org structured data on every API and category page.</p>
+      </div>
 
       <p style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 0.95rem;">
         <strong>Note:</strong> This is an independent project and is not officially affiliated with Bruno or APIs.guru. All OpenAPI specifications are sourced from public repositories and catalogs.
