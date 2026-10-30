@@ -58,6 +58,17 @@ class CatalogDatabase {
     } catch (e) {
       // Column already exists, ignore
     }
+    // Derived from the OpenAPI document (filled in by the server's background backfill)
+    try {
+      this.db.exec(`ALTER TABLE apis ADD COLUMN endpoint_count INTEGER`);
+    } catch (e) {
+      // Column already exists, ignore
+    }
+    try {
+      this.db.exec(`ALTER TABLE apis ADD COLUMN provider TEXT`);
+    } catch (e) {
+      // Column already exists, ignore
+    }
 
     // Tags table
     this.db.exec(`
@@ -309,6 +320,23 @@ class CatalogDatabase {
   getTopApis(limit = 100) {
     const stmt = this.db.prepare('SELECT * FROM apis ORDER BY stars DESC, name ASC LIMIT ?');
     return stmt.all(limit);
+  }
+
+  /** APIs whose spec-derived columns have not been computed yet. */
+  getApisMissingFacts(limit = 200) {
+    const stmt = this.db.prepare(`
+      SELECT id, name, github_url, source_url, openapi_url FROM apis
+      WHERE endpoint_count IS NULL
+      ORDER BY stars DESC, created_at ASC
+      LIMIT ?
+    `);
+    return stmt.all(limit);
+  }
+
+  /** Store spec-derived columns without touching updated_at. */
+  setApiFacts(id, { endpoint_count, provider }) {
+    const stmt = this.db.prepare('UPDATE apis SET endpoint_count = ?, provider = ? WHERE id = ?');
+    return stmt.run(endpoint_count == null ? 0 : endpoint_count, provider || null, id);
   }
 
   getTagsWithCounts() {

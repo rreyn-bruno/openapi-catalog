@@ -9,6 +9,7 @@ const GitHubScraper = require('../scraper/github-scraper');
 const ConversionPipeline = require('../pipeline/converter');
 const APIsGuruImporter = require('../scraper/apisguru-importer');
 const seo = require('../lib/seo');
+const { ownerFromApi } = require('../lib/slug');
 
 class CatalogServer {
   constructor(options = {}) {
@@ -342,30 +343,6 @@ class CatalogServer {
     this.sendPage(res, seo.renderNotFound({ categories: this.getCategories() }), { status: 404, maxAge: 60 });
   }
 
-  /** Minimal skeleton used when an API has no generated documentation yet. */
-  fallbackDocHtml() {
-    return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-</head>
-<body>
-    <main class="page-content">
-        <div class="container-fluid">
-            <div class="row p-lg-4">
-                <article class="main-content col-md-12" id="doc-body">
-                    <p class="text-muted">Endpoint documentation has not been generated for this API yet. Download the Bruno collection or the OpenAPI spec above.</p>
-                </article>
-            </div>
-        </div>
-    </main>
-</body>
-</html>`;
-  }
-
   setupPageRoutes() {
     const app = this.app;
 
@@ -447,7 +424,7 @@ class CatalogServer {
         }
 
         const docsDir = this.docsDirFor(api);
-        const html = docsDir ? fs.readFileSync(path.join(docsDir, 'index.html'), 'utf8') : this.fallbackDocHtml();
+        const html = docsDir ? fs.readFileSync(path.join(docsDir, 'index.html'), 'utf8') : null;
         const tags = this.db.getApiTags(api.id);
         // Related APIs, de-duplicated by name (the catalog holds several copies of some specs)
         const seenNames = new Set([String(api.name || '').toLowerCase()]);
@@ -527,6 +504,12 @@ class CatalogServer {
 
     // Generated documentation assets (the index.html pages themselves are served via /apis/:slug)
     this.app.use('/docs', express.static(this.dataPath('docs'), { maxAge: 7 * oneDay, index: false, redirect: false }));
+
+    // Shared stylesheet/script: short cache so design changes roll out quickly
+    this.app.get(['/site.css', '/site.js'], (req, res) => {
+      res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400');
+      res.sendFile(this.publicPath(req.path.slice(1)));
+    });
 
     // Frontend assets. index.html / about.html are rendered by routes above.
     this.app.use(express.static(this.publicPath(), { maxAge: oneDay, index: false, redirect: false }));
@@ -755,7 +738,45 @@ class CatalogServer {
     }
   }
 
+  /**
+   * Fill endpoint_count / provider for APIs that do not have them yet, a few
+   * rows at a time so the event loop stays responsive. Runs at start-up and
+   * then periodically so newly imported APIs get picked up.
+   */
+  backfillFacts() {
+    if (this.backfillRunning) return;
+    const rows = this.db.getApisMissingFacts(500);
+    if (rows.length === 0) return;
+    this.backfillRunning = true;
+    console.log(`Computing endpoint counts for ${rows.length} API(s)...`);
+    let i = 0;
+    const step = () => {
+      const batch = rows.slice(i, i + 5);
+      i += 5;
+      for (const row of batch) {
+        try {
+          const facts = seo.specFacts(row.id, this.dataPath('openapi'));
+          const provider = seo.apiOwner(row, facts);
+          this.db.setApiFacts(row.id, { endpoint_count: facts.endpoints || 0, provider });
+        } catch (error) {
+          console.error(`Facts backfill failed for ${row.id}:`, error.message);
+          try { this.db.setApiFacts(row.id, { endpoint_count: 0, provider: ownerFromApi(row) }); } catch (e) { /* ignore */ }
+        }
+      }
+      if (i < rows.length) {
+        setImmediate(step);
+      } else {
+        this.backfillRunning = false;
+        if (rows.length === 500) setImmediate(() => this.backfillFacts());
+        else console.log('✓ Endpoint counts up to date');
+      }
+    };
+    setImmediate(step);
+  }
+
   start() {
+    setTimeout(() => this.backfillFacts(), 2000);
+    this.backfillTimer = setInterval(() => this.backfillFacts(), 15 * 60 * 1000);
     this.app.listen(this.port, () => {
       console.log(`\n🚀 Bruno API Catalog running on http://localhost:${this.port}`);
       console.log(`📊 API endpoints: http://localhost:${this.port}/api`);
@@ -764,6 +785,7 @@ class CatalogServer {
   }
 
   close() {
+    if (this.backfillTimer) clearInterval(this.backfillTimer);
     this.db.close();
   }
 }

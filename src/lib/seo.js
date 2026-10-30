@@ -173,12 +173,26 @@ function categoryUrl(cat) {
   return `${SITE_URL}/category/${cat.slug}`;
 }
 
+/** Display category names for an API from its raw tags (de-duplicated, in tag order). */
+function displayCategoriesForTags(tags) {
+  const seen = new Set();
+  return (tags || [])
+    .map(t => displayTagName(typeof t === 'string' ? t : t.name))
+    .filter(n => n && !seen.has(n) && seen.add(n));
+}
+
 // ---------------------------------------------------------------------------
-// OpenAPI spec facts (endpoint count, auth, base URL, ...)
+// OpenAPI spec facts (endpoint count, auth, base URL, operations, ...)
 // ---------------------------------------------------------------------------
 
 const HTTP_METHODS = ['get', 'put', 'post', 'delete', 'patch', 'options', 'head', 'trace'];
+const METHOD_ORDER = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD', 'TRACE'];
 const specCache = new Map();
+
+function methodClass(method) {
+  const m = String(method || '').toLowerCase();
+  return ['get', 'post', 'put', 'patch', 'delete'].includes(m) ? m : 'other';
+}
 
 function authLabel(scheme) {
   if (!scheme || typeof scheme !== 'object') return null;
@@ -194,6 +208,13 @@ function authLabel(scheme) {
   if (type === 'openidconnect') return 'OpenID Connect';
   if (type === 'basic') return 'Basic auth';
   return null;
+}
+
+/** "payment_intents" -> "Payment intents"; "Customers" stays as is. */
+function groupTitle(raw) {
+  const text = String(raw || '').replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!text) return 'Other';
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 /**
@@ -218,13 +239,18 @@ function specFacts(apiId, openapiDir) {
 
     let endpoints = 0;
     const methodCounts = {};
-    for (const item of Object.values(paths)) {
+    const operations = [];
+    for (const [p, item] of Object.entries(paths)) {
       if (!item || typeof item !== 'object') continue;
       for (const method of HTTP_METHODS) {
-        if (item[method]) {
-          endpoints++;
-          methodCounts[method.toUpperCase()] = (methodCounts[method.toUpperCase()] || 0) + 1;
-        }
+        const op = item[method];
+        if (!op || typeof op !== 'object') continue;
+        endpoints++;
+        const M = method.toUpperCase();
+        methodCounts[M] = (methodCounts[M] || 0) + 1;
+        const tag = Array.isArray(op.tags) && op.tags[0] ? String(op.tags[0]) : null;
+        const summary = truncate(op.summary || '', 140) || (op.operationId ? String(op.operationId) : '');
+        operations.push({ method: M, path: String(p), summary, tag });
       }
     }
 
@@ -249,6 +275,7 @@ function specFacts(apiId, openapiDir) {
       endpoints,
       pathCount: Object.keys(paths).length,
       methodCounts,
+      operations,
       baseUrl,
       auth,
       specVersion,
@@ -267,6 +294,22 @@ function specFacts(apiId, openapiDir) {
   return facts;
 }
 
+/** Group operations by first tag, falling back to the first path segment. */
+function endpointGroups(operations) {
+  const groups = new Map();
+  for (const op of operations || []) {
+    let key = op.tag;
+    if (!key) {
+      const seg = op.path.split('/').filter(Boolean)[0] || '';
+      key = seg && !/^\{.*\}$/.test(seg) ? seg : 'Other';
+    }
+    const name = groupTitle(key);
+    if (!groups.has(name)) groups.set(name, { name, ops: [] });
+    groups.get(name).ops.push(op);
+  }
+  return [...groups.values()];
+}
+
 // ---------------------------------------------------------------------------
 // Per-API metadata
 // ---------------------------------------------------------------------------
@@ -280,7 +323,7 @@ function apiPath(api) {
 }
 
 function apiOwner(api, facts) {
-  return (facts && facts.providerName) || ownerFromApi(api) || null;
+  return api.provider || (facts && facts.providerName) || ownerFromApi(api) || null;
 }
 
 function sourceLink(api) {
@@ -322,37 +365,221 @@ function metaDescription(api, { facts = {}, categories = [], owner = null } = {}
 }
 
 // ---------------------------------------------------------------------------
-// API documentation page (wraps the bruno-doc-gen output)
+// Shared page chrome (head, header, footer)
 // ---------------------------------------------------------------------------
 
-const API_PAGE_CSS = `
-<style>
-  .oac-summary{padding:1.25rem 1.5rem 0.5rem;border-bottom:1px solid #e9ecef;background:#fff}
-  .oac-breadcrumb{font-size:.85rem;color:#6c757d;margin-bottom:.5rem}
-  .oac-breadcrumb a{color:#3b82f6;text-decoration:none}
-  .oac-breadcrumb a:hover{text-decoration:underline}
-  .oac-summary h1{font-size:1.6rem;font-weight:700;margin:0 0 .5rem;line-height:1.25}
-  .oac-summary h1 small{font-size:.9rem;color:#6c757d;font-weight:400;margin-left:.5rem}
-  .oac-desc{max-width:72ch;color:#343a40;margin-bottom:1rem}
-  .oac-facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem 1.5rem;margin:0 0 1rem;font-size:.9rem}
-  .oac-facts dt{font-weight:600;color:#6c757d;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em}
-  .oac-facts dd{margin:0;word-break:break-word}
-  .oac-facts code{font-size:.85em;background:#f8f9fa;padding:.1rem .3rem;border-radius:3px}
-  .oac-facts a{color:#3b82f6}
-  .oac-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
-  .oac-actions .btn{display:inline-flex;align-items:center;gap:.35rem}
-  .oac-howto{font-size:.9rem;color:#495057;margin-bottom:1rem}
-  .oac-howto ol{margin:.25rem 0 0 1.1rem;padding:0}
-  .oac-related h2{font-size:1rem;font-weight:600;margin:0 0 .4rem}
-  .oac-related ul{list-style:none;padding:0;margin:0 0 .5rem;display:flex;flex-wrap:wrap;gap:.4rem}
-  .oac-related li a{display:inline-block;padding:.25rem .6rem;border:1px solid #dee2e6;border-radius:999px;font-size:.85rem;color:#343a40;text-decoration:none;background:#f8f9fa}
-  .oac-related li a:hover{border-color:#3b82f6;color:#3b82f6}
-  @media (max-width:768px){.oac-summary{padding:1rem}}
-</style>`;
+const THEME_SCRIPT = `<script>(function(){var t=null;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}document.documentElement.setAttribute('data-theme',t)})();</script>`;
+
+const FONT_LINKS = `<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">`;
+
+function htmlHead({ title, description, canonical, noindex = false, structuredData = [], extra = '' }) {
+  return `<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(title)}</title>
+  <meta name="description" content="${escapeAttr(description)}">
+  <link rel="canonical" href="${escapeAttr(canonical)}">
+  <meta name="robots" content="${noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1'}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="${SITE_NAME}">
+  <meta property="og:url" content="${escapeAttr(canonical)}">
+  <meta property="og:title" content="${escapeAttr(title)}">
+  <meta property="og:description" content="${escapeAttr(description)}">
+  <meta property="og:image" content="${OG_IMAGE}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${SITE_NAME}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escapeAttr(title)}">
+  <meta name="twitter:description" content="${escapeAttr(description)}">
+  <meta name="twitter:image" content="${OG_IMAGE}">
+  <meta name="theme-color" content="#0b0c0e">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  ${structuredData.map(jsonLd).join('\n  ')}
+  ${THEME_SCRIPT}
+  ${FONT_LINKS}
+  <link rel="stylesheet" href="/site.css">
+  ${extra}`;
+}
+
+function siteHeader() {
+  return `<header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/">${SITE_NAME}</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">APIs</a>
+        <a href="/categories">Categories</a>
+        <a href="/about">About</a>
+      </nav>
+      <div class="spacer"></div>
+      <a class="site-llms" href="/llms.txt">llms.txt</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">Light</button>
+    </div>
+  </header>`;
+}
+
+function footerCategoriesNav(categories) {
+  if (!categories || !categories.length) return '';
+  return `<nav class="footer-categories" aria-label="Browse by category">
+      ${categories.map(c => `<a href="/category/${c.slug}">${escapeHtml(c.name)}</a>`).join('\n      ')}
+    </nav>`;
+}
+
+function siteFooter(categories = []) {
+  return `<footer class="site-footer">
+    <div class="wrap">
+      <span>Specs from GitHub and APIs.guru. Built for the <a class="bruno" href="https://www.usebruno.com/" rel="noopener">Bruno</a> API client community.</span>
+      <span class="footer-links"><a href="/about">About</a><a href="/categories">Categories</a><a href="/llms.txt">llms.txt</a><a href="/llms-full.txt">llms-full.txt</a></span>
+    </div>
+    ${footerCategoriesNav(categories)}
+  </footer>`;
+}
+
+// ---------------------------------------------------------------------------
+// API rows (homepage SSR + category pages)
+// ---------------------------------------------------------------------------
+
+function apiRowHtml(api, tags) {
+  const docs = apiPath(api);
+  const source = sourceLink(api);
+  const cats = displayCategoriesForTags(tags);
+  const provider = apiOwner(api) || '';
+  const endpoints = api.endpoint_count == null ? '' : `${formatNumber(api.endpoint_count)} endpoint${Number(api.endpoint_count) === 1 ? '' : 's'}`;
+  const desc = truncate(api.description || '', 160) || 'No description available';
+  return `
+      <li class="api-row" data-href="${escapeAttr(docs)}">
+        <div class="api-row-main">
+          <div>
+            <div class="api-row-name"><a href="${escapeAttr(docs)}">${escapeHtml(cleanText(api.name) || 'Unnamed API')}</a></div>
+            <div class="api-row-provider">${escapeHtml(provider)}</div>
+          </div>
+          <div>
+            <div class="api-row-desc">${escapeHtml(desc)}</div>
+            <div class="api-row-cat">${escapeHtml(cats[0] || 'Uncategorized')}</div>
+          </div>
+        </div>
+        <div class="api-row-meta">
+          <span class="api-row-endpoints">${endpoints}</span>
+          <span class="api-row-version" title="${escapeAttr(api.version || '')}">${escapeHtml(api.version || '')}</span>
+          <span class="api-row-actions">
+            <a class="btn btn-amber" href="/api/apis/${escapeAttr(api.id)}/download" download>Collection</a>
+            <a class="btn btn-outline" href="${escapeAttr(docs)}">Docs</a>
+            ${source ? `<a class="btn btn-outline" href="${escapeAttr(source.url)}" target="_blank" rel="noopener">Source</a>` : ''}
+          </span>
+        </div>
+      </li>`;
+}
+
+/** Row list shared by the homepage and category pages. */
+function renderApiRows(apis, tagMap) {
+  return apis.map(api => apiRowHtml(api, (tagMap && tagMap.get(api.id)) || [])).join('');
+}
+
+/** Clicking a row opens the API page (links and buttons inside keep their own targets). */
+const ROW_CLICK_SCRIPT = `<script>document.addEventListener('click',function(e){if(e.target.closest('a, button'))return;var r=e.target.closest('.api-row[data-href]');if(!r)return;if(window.getSelection&&String(window.getSelection()))return;window.location.href=r.getAttribute('data-href')});</script>`;
+
+// ---------------------------------------------------------------------------
+// API documentation page
+// ---------------------------------------------------------------------------
+
+const PRISM_BASE = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0';
+const PRISM_SCRIPTS = ['prism.min.js', ...['json', 'bash', 'python', 'go', 'ruby', 'java', 'csharp', 'markup-templating', 'php'].map(l => `components/prism-${l}.min.js`)]
+  .map(f => `<script src="${PRISM_BASE}/${f}" data-manual defer></script>`)
+  .join('\n  ');
+
+const LANGUAGE_OPTIONS = [
+  ['shell_curl', 'cURL'],
+  ['javascript_fetch', 'JavaScript (Fetch)'],
+  ['node_native', 'Node.js (HTTP)'],
+  ['python_requests', 'Python (Requests)'],
+  ['go_native', 'Go'],
+  ['ruby_native', 'Ruby'],
+  ['java_okhttp', 'Java (OkHttp)'],
+  ['csharp_restsharp', 'C# (RestSharp)'],
+  ['php_curl', 'PHP (cURL)']
+];
+
+const DETAIL_SCRIPT = `<script>
+(function(){
+  var NA='# Code generation not available';
+  var sel=document.getElementById('global-lang-select');
+  var langClass={shell_curl:'language-bash',javascript_fetch:'language-javascript',node_native:'language-javascript',python_requests:'language-python',go_native:'language-go',ruby_native:'language-ruby',java_okhttp:'language-java',csharp_restsharp:'language-csharp',php_curl:'language-php'};
+  function highlight(el){
+    if(!el||el.getAttribute('data-hl')||typeof Prism==='undefined')return;
+    el.setAttribute('data-hl','1');
+    var codes=el.querySelectorAll('code');
+    for(var i=0;i<codes.length;i++){try{Prism.highlightElement(codes[i])}catch(e){}}
+  }
+  function showLang(lang){
+    var boxes=document.querySelectorAll('.example-request-code-samples, .code-samples');
+    for(var i=0;i<boxes.length;i++){
+      var samples=boxes[i].querySelectorAll('.code-sample');
+      for(var j=0;j<samples.length;j++){samples[j].classList.toggle('active',samples[j].getAttribute('data-lang')===lang)}
+      var act=boxes[i].querySelector('.code-sample.active');
+      var ok=!!act&&act.textContent.indexOf(NA)===-1;
+      var wrap=boxes[i].closest('.sample-request, .example-request-code')||boxes[i];
+      wrap.classList.toggle('is-empty',!ok);
+      if(ok)highlight(act);
+    }
+  }
+  var samples=document.querySelectorAll('.code-sample'),hasReal=false;
+  for(var i=0;i<samples.length;i++){
+    var c=samples[i].querySelector('code');var k=langClass[samples[i].getAttribute('data-lang')];
+    if(c&&k)c.classList.add(k);
+    if(!hasReal&&samples[i].textContent.indexOf(NA)===-1)hasReal=true;
+  }
+  var ctl=document.getElementById('lang-control');
+  if(ctl&&!hasReal)ctl.style.display='none';
+  var raws=document.querySelectorAll('.raw-body pre code');
+  for(var r=0;r<raws.length;r++){
+    var box=raws[r].closest('.request-body'),type=box?box.querySelector('.body-type'):null,tt=type?type.textContent.toLowerCase():'';
+    if(tt.indexOf('json')!==-1)raws[r].classList.add('language-json');else if(tt.indexOf('xml')!==-1)raws[r].classList.add('language-markup');
+  }
+  var bodies=document.querySelectorAll('.response-body pre code');
+  for(var b=0;b<bodies.length;b++){
+    var t=bodies[b].textContent.trim();
+    try{bodies[b].textContent=JSON.stringify(JSON.parse(t),null,2)}catch(e){if(t.charAt(0)==='<'){bodies[b].classList.remove('language-json');bodies[b].classList.add('language-markup')}}
+  }
+  if(sel){sel.addEventListener('change',function(){showLang(this.value)})}
+  document.addEventListener('click',function(e){
+    var tab=e.target.closest('.response-tab');if(!tab)return;
+    var id=tab.getAttribute('data-request-id'),idx=tab.getAttribute('data-response-index');
+    var tabs=document.querySelectorAll('.response-tab[data-request-id="'+id+'"]');
+    for(var i=0;i<tabs.length;i++){tabs[i].classList.toggle('active',tabs[i]===tab)}
+    var panes=document.querySelectorAll('.response-content[data-request-id="'+id+'"]');
+    for(var j=0;j<panes.length;j++){var on=panes[j].getAttribute('data-response-index')===idx;panes[j].classList.toggle('active',on);if(on)highlight(panes[j])}
+  });
+  function norm(p){return String(p||'').replace(/^\\{\\{baseUrl\\}\\}/,'').replace(/^https?:\\/\\/[^/]+/,'').split('?')[0].replace(/\\{([^}]+)\\}/g,':$1').replace(/\\/+$/,'')||'/'}
+  var refs={},secs=document.querySelectorAll('.ref .api-information[id]');
+  for(var s=0;s<secs.length;s++){var m=secs[s].querySelector('.method'),u=secs[s].querySelector('.url');if(!m||!u)continue;refs[m.textContent.trim().toUpperCase()+' '+norm(u.textContent)]=secs[s].id}
+  var rows=document.querySelectorAll('.ep[data-method]');
+  for(var q=0;q<rows.length;q++){var id=refs[rows[q].getAttribute('data-method')+' '+norm(rows[q].getAttribute('data-path'))];if(id)rows[q].setAttribute('href','#'+id)}
+  function onReady(){
+    showLang(sel?sel.value:'shell_curl');
+    var pres=document.querySelectorAll('.raw-body pre, .response-content.active');
+    for(var i=0;i<pres.length;i++)highlight(pres[i]);
+  }
+  if(document.readyState==='complete')onReady();else window.addEventListener('load',onReady);
+})();
+</script>`;
+
+/** Pull the generated endpoint reference out of a bruno-doc-gen page. */
+function extractDocBody(html) {
+  if (!html) return '';
+  const start = html.indexOf('id="doc-body"');
+  if (start === -1) return '';
+  const open = html.indexOf('>', start);
+  const end = html.lastIndexOf('</article>');
+  if (open === -1 || end === -1 || end < open) return '';
+  return html.slice(open + 1, end).trim();
+}
 
 /**
- * Inject SEO head tags, a breadcrumb, a summary block, and related links into
- * a generated bruno-doc-gen page.
+ * Render the API page: a summary built from the database row and spec facts,
+ * followed by the bruno-doc-gen endpoint reference (restyled) when it exists.
  */
 function renderApiPage({ html, api, tags = [], related = [], facts = {}, categories = [], isDuplicate = false }) {
   const owner = apiOwner(api, facts);
@@ -366,15 +593,18 @@ function renderApiPage({ html, api, tags = [], related = [], facts = {}, categor
   const updated = toDateOnly(api.updated_at || api.last_synced_at || api.created_at);
   const primaryCat = apiCats[0] || null;
   const specPath = `${apiPath(api)}/openapi.json`;
+  const specUrl = `${SITE_URL}${specPath}`;
   const downloadPath = `/api/apis/${api.id}/download`;
+  const downloadUrl = `${SITE_URL}${downloadPath}`;
+  const endpointCount = facts.endpoints != null ? facts.endpoints : api.endpoint_count;
 
-  // ---- head -------------------------------------------------------------
+  // ---- structured data ----------------------------------------------------
   const graph = [
     {
       '@type': 'WebAPI',
       '@id': `${url}#api`,
       name,
-      description: description,
+      description,
       url,
       documentation: url,
       ...(api.version ? { version: String(api.version) } : {}),
@@ -413,257 +643,185 @@ function renderApiPage({ html, api, tags = [], related = [], facts = {}, categor
       ...(api.github_url ? { codeRepository: api.github_url } : {}),
       programmingLanguage: 'Bruno',
       isAccessibleForFree: true,
-      downloadUrl: `${SITE_URL}${downloadPath}`
+      downloadUrl
     }
   ];
 
-  const head = `
-    <meta name="description" content="${escapeAttr(description)}">
-    <link rel="canonical" href="${escapeAttr(url)}">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="${SITE_NAME}">
-    <meta property="og:url" content="${escapeAttr(url)}">
-    <meta property="og:title" content="${escapeAttr(title)}">
-    <meta property="og:description" content="${escapeAttr(description)}">
-    <meta property="og:image" content="${OG_IMAGE}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="${SITE_NAME}">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="${escapeAttr(title)}">
-    <meta name="twitter:description" content="${escapeAttr(description)}">
-    <meta name="twitter:image" content="${OG_IMAGE}">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="preconnect" href="https://stackpath.bootstrapcdn.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://use.fontawesome.com" crossorigin>
-    ${jsonLd({ '@context': 'https://schema.org', '@graph': graph })}
-    ${API_PAGE_CSS}`;
-
-  // ---- body: breadcrumb + summary ----------------------------------------
+  // ---- facts grid -----------------------------------------------------------
   const factRows = [];
-  if (facts.endpoints) {
-    const methods = Object.entries(facts.methodCounts || {})
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 4)
-      .map(([m, c]) => `${c} ${m}`)
-      .join(', ');
-    factRows.push(['Endpoints', `${facts.endpoints}${methods ? ` <span style="color:#6c757d">(${escapeHtml(methods)})</span>` : ''}`]);
-  }
+  if (endpointCount) factRows.push(['Endpoints', formatNumber(endpointCount)]);
   if (facts.baseUrl) factRows.push(['Base URL', `<code>${escapeHtml(facts.baseUrl)}</code>`]);
   factRows.push(['Authentication', facts.auth && facts.auth.length ? escapeHtml(facts.auth.join(', ')) : 'Not specified in spec']);
   if (facts.specVersion) factRows.push(['Spec format', escapeHtml(facts.specVersion)]);
   if (api.version) factRows.push(['API version', escapeHtml(api.version)]);
-  if (source) {
-    const stars = api.stars ? ` <span title="GitHub stars">★ ${formatStars(api.stars)}</span>` : '';
-    factRows.push(['Source', `<a href="${escapeAttr(source.url)}" rel="noopener" target="_blank">${escapeHtml(source.label)}</a>${stars}`]);
-  }
   if (owner) factRows.push(['Provider', escapeHtml(owner)]);
   if (facts.license) {
     factRows.push(['License', facts.license.url
       ? `<a href="${escapeAttr(facts.license.url)}" rel="noopener nofollow" target="_blank">${escapeHtml(facts.license.name)}</a>`
       : escapeHtml(facts.license.name)]);
   }
-  if (apiCats.length) {
-    factRows.push(['Categories', apiCats.map(c => `<a href="/category/${c.slug}">${escapeHtml(c.name)}</a>`).join(', ')]);
-  }
   if (updated) factRows.push(['Last updated', `<time datetime="${updated}">${updated}</time>`]);
 
-  const breadcrumb = `
-    <nav class="oac-breadcrumb" aria-label="Breadcrumb">
-      <a href="/">${SITE_NAME}</a> ›
-      ${primaryCat ? `<a href="/category/${primaryCat.slug}">${escapeHtml(primaryCat.name)}</a> › ` : ''}
-      <span>${escapeHtml(name)}</span>
-    </nav>`;
-
-  const relatedHtml = related.length
-    ? `<div class="oac-related">
-        <h2>Related APIs</h2>
-        <ul>${related.map(r => `<li><a href="${escapeAttr(apiPath(r))}">${escapeHtml(cleanText(r.name))}</a></li>`).join('')}</ul>
-      </div>`
+  // ---- endpoints ------------------------------------------------------------
+  const methodCounts = facts.methodCounts || {};
+  const methodsSorted = Object.keys(methodCounts).sort((a, b) => {
+    const ia = METHOD_ORDER.indexOf(a), ib = METHOD_ORDER.indexOf(b);
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  });
+  const groups = endpointGroups(facts.operations);
+  const endpointsHtml = groups.length
+    ? `
+      <section class="endpoints" id="doc-body">
+        <div class="section-head">
+          <h2>Endpoints</h2>
+          <span class="total">${formatNumber(facts.endpoints)} total</span>
+        </div>
+        <div class="method-bar" aria-hidden="true">
+          ${methodsSorted.map(m => `<span class="bg-${methodClass(m)}" style="flex:${methodCounts[m]}"></span>`).join('')}
+        </div>
+        <div class="method-legend">
+          ${methodsSorted.map(m => `<span><span class="m-${methodClass(m)}">${escapeHtml(m)}</span> ${formatNumber(methodCounts[m])}</span>`).join('')}
+        </div>
+        ${groups.map(g => `
+        <div class="ep-group">
+          <h3>${escapeHtml(g.name)}</h3>
+          <div class="ep-list">
+            ${g.ops.map(op => `<a class="ep" data-method="${escapeAttr(op.method)}" data-path="${escapeAttr(op.path)}"><span class="ep-method m-${methodClass(op.method)}">${escapeHtml(op.method)}</span><span class="ep-path" title="${escapeAttr(op.path)}">${escapeHtml(op.path)}</span><span class="ep-summary" title="${escapeAttr(op.summary)}">${escapeHtml(op.summary)}</span></a>`).join('\n            ')}
+          </div>
+        </div>`).join('')}
+      </section>`
     : '';
 
-  const summary = `
-  <section class="oac-summary" id="overview">
-    ${breadcrumb}
-    <h1>${escapeHtml(name)}${api.version ? `<small>v${escapeHtml(api.version)}</small>` : ''}</h1>
-    ${longDescription ? `<p class="oac-desc">${escapeHtml(longDescription)}</p>` : ''}
-    <dl class="oac-facts">
-      ${factRows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}
-    </dl>
-    <div class="oac-actions">
-      <a class="btn btn-primary btn-sm" href="${downloadPath}">Download Bruno collection (.zip)</a>
-      <a class="btn btn-outline-secondary btn-sm" href="${escapeAttr(specPath)}">OpenAPI spec (JSON)</a>
-      ${source ? `<a class="btn btn-outline-secondary btn-sm" href="${escapeAttr(source.url)}" rel="noopener" target="_blank">Source</a>` : ''}
-      <a class="btn btn-outline-secondary btn-sm" href="#doc-body">Jump to endpoints</a>
+  // ---- reference (bruno-doc-gen output) ------------------------------------
+  const docBody = extractDocBody(html);
+  const referenceHtml = docBody
+    ? `
+      <section class="ref" id="reference"${groups.length ? '' : ' data-doc-body'}>
+        <div class="section-head">
+          <h2>Reference</h2>
+          <label id="lang-control"><span class="faint" style="font-size:12.5px;margin-right:8px">Code samples</span><select id="global-lang-select">${LANGUAGE_OPTIONS.map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select></label>
+        </div>
+        ${docBody}
+      </section>`
+    : (groups.length ? '' : `
+      <section class="ref" id="doc-body">
+        <p class="no-docs">Endpoint documentation has not been generated for this API yet. Download the Bruno collection or the OpenAPI spec above.</p>
+      </section>`);
+
+  // ---- aside ----------------------------------------------------------------
+  const markdown = [
+    `# ${name}${api.version ? ` (v${api.version})` : ''}`,
+    longDescription,
+    '',
+    ...(facts.baseUrl ? [`- Base URL: ${facts.baseUrl}`] : []),
+    ...(facts.auth && facts.auth.length ? [`- Auth: ${facts.auth.join(', ')}`] : []),
+    ...(endpointCount ? [`- Endpoints: ${endpointCount}`] : []),
+    `- Spec: ${specUrl}`,
+    `- Collection: ${downloadUrl}`
+  ].filter((line, i, arr) => !(line === '' && arr[i - 1] === '')).join('\n');
+
+  const curl = `curl ${specUrl}\ncurl -LO ${downloadUrl}`;
+
+  const relatedHtml = related.length
+    ? `<div class="related">
+          <h2>Related</h2>
+          ${related.map(r => `<a href="${escapeAttr(apiPath(r))}"><span>${escapeHtml(cleanText(r.name))}</span><span class="n">${r.endpoint_count != null ? formatNumber(r.endpoint_count) : ''}</span></a>`).join('\n          ')}
+        </div>`
+    : '';
+
+  const catLinks = apiCats.length
+    ? apiCats.map(c => `<a href="/category/${c.slug}">${escapeHtml(c.name)}</a>`).join(', ')
+    : '';
+  const subline = [owner ? escapeHtml(owner) : '', catLinks].filter(Boolean).join(' · ');
+
+  const body = `
+  <main class="detail">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/">Catalog</a><span>/</span>${primaryCat ? `<a href="/category/${primaryCat.slug}">${escapeHtml(primaryCat.name)}</a><span>/</span>` : ''}<span class="current">${escapeHtml(name)}</span>
+    </nav>
+    <div class="detail-cols">
+      <div class="detail-main">
+        <div class="title-row">
+          <h1>${escapeHtml(name)}</h1>
+          ${api.version ? `<span class="version">v${escapeHtml(api.version)}</span>` : ''}
+        </div>
+        ${subline ? `<div class="subline">${subline}</div>` : ''}
+        ${longDescription ? `<p class="detail-desc">${escapeHtml(longDescription)}</p>` : ''}
+        <div class="actions">
+          <a class="btn btn-lg btn-amber" href="${downloadPath}">Download Bruno collection (.zip)</a>
+          <a class="btn btn-lg btn-outline" href="${escapeAttr(specPath)}">OpenAPI spec (JSON)</a>
+          ${source ? `<a class="btn btn-lg btn-outline" href="${escapeAttr(source.url)}" rel="noopener" target="_blank">Source</a>` : ''}
+          <button class="btn btn-lg btn-outline" type="button" data-copy="${escapeAttr(markdown)}" data-copied="Copied">Copy as Markdown</button>
+        </div>
+        <dl class="facts">
+          ${factRows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('\n          ')}
+        </dl>
+        ${endpointsHtml}
+        ${referenceHtml}
+      </div>
+      <aside class="detail-aside">
+        <div class="panel">
+          <div class="panel-head"><span>Fetch</span><button class="copy-btn" type="button" data-copy="${escapeAttr(curl)}">copy</button></div>
+          <pre><span class="c"># raw spec</span>
+<span class="k">curl</span> ${escapeHtml(specUrl)}
+
+<span class="c"># collection</span>
+<span class="k">curl -LO</span> ${escapeHtml(downloadUrl)}</pre>
+        </div>
+        <div class="aside-box">
+          <h2>Use this API in Bruno</h2>
+          <ol>
+            <li>Download the Bruno collection above and unzip it.</li>
+            <li>In Bruno, choose <em>Open Collection</em> and select the unzipped folder.</li>
+            <li>Set the <code>baseUrl</code> variable${facts.baseUrl ? ` (for example <code>${escapeHtml(facts.baseUrl)}</code>)` : ''}${facts.auth && facts.auth.length ? ` and your ${escapeHtml(facts.auth[0])} credentials` : ''}, then send requests.</li>
+          </ol>
+        </div>
+        ${relatedHtml}
+      </aside>
     </div>
-    <div class="oac-howto">
-      <strong>Use this API in Bruno:</strong>
-      <ol>
-        <li>Download the Bruno collection above and unzip it.</li>
-        <li>In Bruno, choose <em>Open Collection</em> and select the unzipped folder.</li>
-        <li>Set the <code>baseUrl</code> variable${facts.baseUrl ? ` (for example <code>${escapeHtml(facts.baseUrl)}</code>)` : ''}${facts.auth && facts.auth.length ? ` and your ${escapeHtml(facts.auth[0])} credentials` : ''}, then send requests.</li>
-      </ol>
-    </div>
-    ${relatedHtml}
-  </section>`;
+  </main>`;
 
-  // ---- apply ---------------------------------------------------------------
-  let out = html;
-
-  // Title
-  out = out.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>${head}`);
-  if (!/<title>/i.test(html)) {
-    out = out.replace(/<head>/i, `<head><title>${escapeHtml(title)}</title>${head}`);
-  }
-
-  // Absolute asset paths so the page works at /apis/:slug
-  const assetBase = `/docs/${api.id}/assets/`;
-  out = out.replace(/(href|src)="assets\//g, `$1="${assetBase}`);
-
-  // Summary block
-  const marker = '<div class="row p-lg-4">';
-  if (out.includes(marker)) {
-    out = out.replace(marker, `${summary}\n${marker}`);
-  } else if (out.includes('<div class="container-fluid">')) {
-    out = out.replace('<div class="container-fluid">', `<div class="container-fluid">${summary}`);
-  } else {
-    out = out.replace(/<body[^>]*>/i, m => `${m}${summary}`);
-  }
-
-  return out;
+  return `<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  ${htmlHead({ title, description, canonical: url, structuredData: [{ '@context': 'https://schema.org', '@graph': graph }], extra: PRISM_SCRIPTS })}
+</head>
+<body>
+  ${siteHeader()}
+  ${body}
+  ${siteFooter()}
+  <script src="/site.js"></script>
+  ${DETAIL_SCRIPT}
+</body>
+</html>`;
 }
 
 // ---------------------------------------------------------------------------
 // Shared page layout for server-rendered pages (categories, 404)
 // ---------------------------------------------------------------------------
 
-const LAYOUT_CSS = `
-:root{--primary:#3b82f6;--bg:#fff;--bg2:#f7fafc;--text:#1a202c;--muted:#718096;--border:#e2e8f0}
-*{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--text);background:var(--bg);line-height:1.55}
-a{color:var(--primary)}
-.container{max-width:1200px;margin:0 auto;padding:0 16px}
-header.site{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:2.5rem 0}
-header.site a{color:#fff;text-decoration:none}
-header.site .brand{font-weight:700;font-size:1rem;opacity:.9;display:inline-block;margin-bottom:.75rem}
-header.site h1{margin:0 0 .5rem;font-size:2.25rem;line-height:1.2}
-header.site p{margin:0;max-width:70ch;opacity:.92}
-nav.crumbs{font-size:.875rem;color:var(--muted);margin:1rem 0}
-main{padding:1rem 0 3rem}
-.api-table{width:100%;border-collapse:collapse;margin-top:1rem;background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.api-table th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:var(--bg2);padding:.75rem 1rem;border-bottom:1px solid var(--border)}
-.api-table td{padding:.9rem 1rem;border-bottom:1px solid var(--border);vertical-align:top}
-.api-table tr:last-child td{border-bottom:0}
-.api-name{font-weight:600}
-.api-name a{color:var(--text);text-decoration:none}
-.api-name a:hover{color:var(--primary)}
-.api-description{color:var(--muted);font-size:.875rem;margin-top:.2rem;max-width:70ch}
-.tag{display:inline-block;background:var(--bg2);border:1px solid var(--border);border-radius:999px;padding:.1rem .6rem;font-size:.75rem;margin:.1rem .25rem .1rem 0;color:var(--text)}
-.btn{display:inline-block;padding:.35rem .7rem;border-radius:6px;font-size:.8rem;text-decoration:none;border:1px solid var(--border);color:var(--text);white-space:nowrap}
-.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
-.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem;margin:1.5rem 0}
-.cat-grid a{display:flex;justify-content:space-between;align-items:center;padding:.8rem 1rem;border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);background:#fff}
-.cat-grid a:hover{border-color:var(--primary)}
-.cat-grid span.count{color:var(--muted);font-size:.85rem}
-.muted{color:var(--muted)}
-footer.site{border-top:1px solid var(--border);padding:2rem 0;color:var(--muted);font-size:.875rem}
-footer.site nav a{margin-right:.9rem;white-space:nowrap}
-@media (max-width:768px){header.site h1{font-size:1.6rem}.api-table td.hide-sm,.api-table th.hide-sm{display:none}}
-`;
-
-function layout({ title, description, canonical, heading, lede, crumbs = [], body, structuredData = [], categories = [], noindex = false }) {
+function layout({ title, description, canonical, heading, lede, crumbs = [], body, structuredData = [], categories = [], noindex = false, scripts = '' }) {
   const crumbHtml = crumbs.length
-    ? `<nav class="crumbs" aria-label="Breadcrumb">${crumbs.map((c, i) => (i < crumbs.length - 1 ? `<a href="${escapeAttr(c.href)}">${escapeHtml(c.name)}</a> › ` : `<span>${escapeHtml(c.name)}</span>`)).join('')}</nav>`
-    : '';
-  const footerNav = categories.length
-    ? `<nav aria-label="Categories"><strong>Browse by category:</strong> ${categories.map(c => `<a href="/category/${c.slug}">${escapeHtml(c.name)}</a>`).join(' ')}</nav>`
+    ? `<nav class="crumbs" aria-label="Breadcrumb">${crumbs.map((c, i) => (i < crumbs.length - 1 ? `<a href="${escapeAttr(c.href)}">${escapeHtml(c.name)}</a><span>/</span>` : `<span class="current">${escapeHtml(c.name)}</span>`)).join('')}</nav>`
     : '';
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHtml(title)}</title>
-  <meta name="description" content="${escapeAttr(description)}">
-  <link rel="canonical" href="${escapeAttr(canonical)}">
-  <meta name="robots" content="${noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1'}">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="${SITE_NAME}">
-  <meta property="og:url" content="${escapeAttr(canonical)}">
-  <meta property="og:title" content="${escapeAttr(title)}">
-  <meta property="og:description" content="${escapeAttr(description)}">
-  <meta property="og:image" content="${OG_IMAGE}">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="${escapeAttr(title)}">
-  <meta name="twitter:description" content="${escapeAttr(description)}">
-  <meta name="twitter:image" content="${OG_IMAGE}">
-  <meta name="theme-color" content="#3b82f6">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-  ${structuredData.map(jsonLd).join('\n  ')}
-  <style>${LAYOUT_CSS}</style>
+  ${htmlHead({ title, description, canonical, noindex, structuredData })}
 </head>
 <body>
-  <header class="site">
-    <div class="container">
-      <a class="brand" href="/">← ${SITE_NAME}</a>
-      <h1>${escapeHtml(heading)}</h1>
-      ${lede ? `<p>${lede}</p>` : ''}
-    </div>
-  </header>
-  <main>
-    <div class="container">
-      ${crumbHtml}
-      ${body}
-    </div>
+  ${siteHeader()}
+  <main class="page">
+    ${crumbHtml}
+    <h1 class="page-title">${escapeHtml(heading)}</h1>
+    ${lede ? `<p class="page-lede">${lede}</p>` : ''}
+    ${body}
   </main>
-  <footer class="site">
-    <div class="container">
-      ${footerNav}
-      <p style="margin-top:1rem">Built for the <a href="https://www.usebruno.com/" rel="noopener">Bruno</a> API client community · <a href="/about">About</a> · <a href="/categories">All categories</a> · <a href="/llms.txt">llms.txt</a></p>
-    </div>
-  </footer>
+  ${siteFooter(categories)}
+  <script src="/site.js"></script>
+  ${scripts}
 </body>
 </html>`;
-}
-
-/** Table rows shared by the homepage and category pages. */
-function renderApiRows(apis, tagMap, { showTags = true } = {}) {
-  return apis.map(api => {
-    const tags = (tagMap && tagMap.get(api.id)) || [];
-    const seen = new Set();
-    const tagHtml = tags
-      .map(t => displayTagName(t.name))
-      .filter(n => n && !seen.has(n) && seen.add(n))
-      .slice(0, 3)
-      .map(n => `<a class="tag" href="/category/${categorySlug(n)}">${escapeHtml(n)}</a>`)
-      .join('') || '<span class="tag">Uncategorized</span>';
-    const source = sourceLink(api);
-    const desc = truncate(api.description || '', 140) || 'No description available';
-    return `
-      <tr>
-        <td>
-          <div class="api-name"><a href="${escapeAttr(apiPath(api))}">${escapeHtml(cleanText(api.name) || 'Unnamed API')}</a></div>
-          <div class="api-description">${escapeHtml(desc)}</div>
-        </td>
-        ${showTags ? `<td><div class="api-tags">${tagHtml}</div></td>` : ''}
-        <td class="hide-sm"><span class="muted" style="font-size:.875rem">v${escapeHtml(api.version || '1.0.0')}</span>${api.stars ? `<div class="muted" style="font-size:.8rem">★ ${formatStars(api.stars)}</div>` : ''}</td>
-        <td>
-          <div class="api-actions">
-            <a href="/api/apis/${api.id}/download" class="btn btn-primary" download>Bruno</a>
-            <a href="${escapeAttr(apiPath(api))}" class="btn btn-secondary">Docs</a>
-            ${source ? `<a href="${escapeAttr(source.url)}" class="btn btn-secondary" target="_blank" rel="noopener">${source.url.includes('github.com') ? 'GitHub' : 'Source'}</a>` : ''}
-          </div>
-        </td>
-      </tr>`;
-  }).join('');
 }
 
 // ---------------------------------------------------------------------------
@@ -673,49 +831,28 @@ function renderApiRows(apis, tagMap, { showTags = true } = {}) {
 function renderHome({ indexHtml, totalApis, categories, topApis, tagMap }) {
   let out = indexHtml;
 
-  out = out.replace(/id="totalApis">[^<]*</, `id="totalApis">${formatNumber(totalApis)}<`);
-  out = out.replace(/id="totalTags">[^<]*</, `id="totalTags">${categories.length}<`);
   out = out.replace(/<span data-ssr="count">[^<]*<\/span>/g, `<span data-ssr="count">${formatNumber(totalApis)}</span>`);
+  out = out.replace(/placeholder="Search [^"]*"/, `placeholder="Search ${formatNumber(totalApis)} APIs by name, provider, or category"`);
 
-  // Category dropdown
-  out = out.replace(/(<select id="categoryFilter">)[\s\S]*?(<\/select>)/, (m, open, close) => {
-    const options = ['<option value="">All Categories</option>']
-      .concat(categories.map(c => `<option value="${escapeAttr(c.name)}">${escapeHtml(c.name)} (${c.count})</option>`));
-    return `${open}\n            ${options.join('\n            ')}\n          ${close}`;
+  // Category chips (crawlable links to category pages)
+  out = out.replace(/(<div class="chips" id="filterTags">)[\s\S]*?(<\/div>)/, (m, open, close) => {
+    const chips = [`<a class="chip active" href="/" data-category="" onclick="toggleFilter(null); return false;">All <span class="count">${formatNumber(totalApis)}</span></a>`]
+      .concat(categories.slice(0, 9).map(c =>
+        `<a class="chip" href="/category/${c.slug}" data-category="${escapeAttr(c.name)}" onclick="toggleFilter(this.dataset.category); return false;">${escapeHtml(c.name)} <span class="count">${formatNumber(c.count)}</span></a>`
+      ));
+    return `${open}\n          ${chips.join('\n          ')}\n        ${close}`;
   });
 
-  // Filter chips (crawlable links to category pages)
-  out = out.replace(/(<div class="filter-tags" id="filterTags">)[\s\S]*?(<\/div>)/, (m, open, close) => {
-    const chips = categories.slice(0, 12).map(c =>
-      `<a class="filter-tag" href="/category/${c.slug}" data-category="${escapeAttr(c.name)}" onclick="toggleFilter(this.dataset.category); return false;">${escapeHtml(c.name)} (${c.count})</a>`
-    );
-    return `${open}\n        ${chips.join('\n        ')}\n      ${close}`;
-  });
-
-  // Pre-rendered table of the most popular APIs
-  const table = `
-      <div class="api-table-container">
-        <table class="api-table">
-          <thead>
-            <tr>
-              <th>API</th>
-              <th>Tags</th>
-              <th>Version</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>${renderApiRows(topApis, tagMap)}
-          </tbody>
-        </table>
-      </div>
-      <p class="muted" style="text-align:center;margin:1rem 0;font-size:.875rem">Showing the ${topApis.length} most-starred APIs. <a href="/categories">Browse all ${formatNumber(totalApis)} APIs by category</a>.</p>`;
-  out = out.replace('<!--SSR:CONTENT-->', table);
+  // Result count + pre-rendered rows for the most popular APIs
+  out = out.replace(/(<div class="result-count" id="resultCount">)[\s\S]*?(<\/div>)/, `$1${formatNumber(topApis.length)} of <span data-ssr="count">${formatNumber(totalApis)}</span> APIs$2`);
+  const rows = `
+      <ul class="api-rows">${renderApiRows(topApis, tagMap)}
+      </ul>
+      <p class="note">Showing the ${topApis.length} most-starred APIs. <a href="/categories">Browse all ${formatNumber(totalApis)} APIs by category</a>.</p>`;
+  out = out.replace('<!--SSR:CONTENT-->', rows);
 
   // Footer category navigation
-  out = out.replace('<!--SSR:CATEGORIES-->',
-    `<nav class="footer-categories" aria-label="Browse by category">
-        ${categories.map(c => `<a href="/category/${c.slug}">${escapeHtml(c.name)}</a>`).join('\n        ')}
-      </nav>`);
+  out = out.replace('<!--SSR:CATEGORIES-->', footerCategoriesNav(categories));
 
   // Structured data
   const itemList = {
@@ -757,6 +894,7 @@ function renderAbout({ aboutHtml, totalApis, categories }) {
   out = out.replace(/id="totalApis">[^<]*</, `id="totalApis">${formatNumber(totalApis)}<`);
   out = out.replace(/<span data-ssr="count">[^<]*<\/span>/g, `<span data-ssr="count">${formatNumber(totalApis)}</span>`);
   out = out.replace(/<span data-ssr="categories">[^<]*<\/span>/g, `<span data-ssr="categories">${categories.length}</span>`);
+  out = out.replace('<!--SSR:CATEGORIES-->', footerCategoriesNav(categories));
   return out;
 }
 
@@ -809,14 +947,13 @@ function renderCategoryPage({ category, apis, tagMap, categories, totalApis }) {
   ];
 
   const body = `
-    <p>These ${count} APIs are tagged <strong>${escapeHtml(category.name)}</strong> in the ${SITE_NAME}, which indexes ${formatNumber(totalApis)} public OpenAPI specifications in total. Each entry links to interactive documentation generated from the spec, the original source, and a downloadable <a href="https://www.usebruno.com/" rel="noopener">Bruno</a> collection you can open locally. APIs are ordered by GitHub stars.</p>
-    <table class="api-table">
-      <thead><tr><th>API</th><th>Tags</th><th class="hide-sm">Version</th><th>Actions</th></tr></thead>
-      <tbody>${renderApiRows(apis, tagMap)}</tbody>
-    </table>
-    <h2 style="margin-top:2.5rem">Other categories</h2>
+    <p class="intro">These ${count} APIs are tagged <strong>${escapeHtml(category.name)}</strong> in the ${SITE_NAME}, which indexes ${formatNumber(totalApis)} public OpenAPI specifications in total. Each entry links to documentation generated from the spec, the original source, and a downloadable <a href="https://www.usebruno.com/" rel="noopener">Bruno</a> collection you can open locally. APIs are ordered by GitHub stars.</p>
+    <div class="result-count">${formatNumber(count)} of ${formatNumber(totalApis)} APIs</div>
+    <ul class="api-rows">${renderApiRows(apis, tagMap)}
+    </ul>
+    <h2>Other categories</h2>
     <div class="cat-grid">
-      ${others.map(c => `<a href="/category/${c.slug}"><span>${escapeHtml(c.name)}</span><span class="count">${c.count}</span></a>`).join('')}
+      ${others.map(c => `<a href="/category/${c.slug}"><span>${escapeHtml(c.name)}</span><span class="count">${formatNumber(c.count)}</span></a>`).join('\n      ')}
     </div>`;
 
   return layout({
@@ -824,11 +961,12 @@ function renderCategoryPage({ category, apis, tagMap, categories, totalApis }) {
     description,
     canonical: url,
     heading: `${category.name} APIs`,
-    lede: `${count} public ${escapeHtml(category.name)} APIs with OpenAPI specs, docs, and Bruno collections.`,
-    crumbs: [{ name: SITE_NAME, href: '/' }, { name: 'Categories', href: '/categories' }, { name: category.name, href: `/category/${category.slug}` }],
+    lede: `${formatNumber(count)} public ${escapeHtml(category.name)} APIs with OpenAPI specs, docs, and Bruno collections.`,
+    crumbs: [{ name: 'Catalog', href: '/' }, { name: 'Categories', href: '/categories' }, { name: category.name, href: `/category/${category.slug}` }],
     body,
     structuredData,
-    categories
+    categories,
+    scripts: ROW_CLICK_SCRIPT
   });
 }
 
@@ -864,9 +1002,9 @@ function renderCategoriesIndex({ categories, totalApis }) {
     }
   ];
   const body = `
-    <p>Every API in the catalog is tagged with one or more categories. Pick a category to see its APIs ranked by popularity, each with an OpenAPI spec, generated documentation, and a Bruno collection.</p>
+    <p class="intro">Every API in the catalog is tagged with one or more categories. Pick a category to see its APIs ranked by popularity, each with an OpenAPI spec, generated documentation, and a Bruno collection.</p>
     <div class="cat-grid">
-      ${categories.map(c => `<a href="/category/${c.slug}"><span>${escapeHtml(c.name)}</span><span class="count">${c.count} APIs</span></a>`).join('')}
+      ${categories.map(c => `<a href="/category/${c.slug}"><span>${escapeHtml(c.name)}</span><span class="count">${formatNumber(c.count)} API${c.count === 1 ? '' : 's'}</span></a>`).join('\n      ')}
     </div>`;
   return layout({
     title,
@@ -874,7 +1012,7 @@ function renderCategoriesIndex({ categories, totalApis }) {
     canonical: url,
     heading: 'Browse APIs by category',
     lede: `${categories.length} categories · ${formatNumber(totalApis)} OpenAPI specifications`,
-    crumbs: [{ name: SITE_NAME, href: '/' }, { name: 'Categories', href: '/categories' }],
+    crumbs: [{ name: 'Catalog', href: '/' }, { name: 'Categories', href: '/categories' }],
     body,
     structuredData,
     categories: []
@@ -888,7 +1026,7 @@ function renderNotFound({ categories = [] } = {}) {
     canonical: `${SITE_URL}/404`,
     heading: 'Page not found',
     lede: 'That API or page does not exist, or it may have moved.',
-    body: `<p><a href="/">Back to the catalog</a> or <a href="/categories">browse by category</a>.</p>`,
+    body: `<p class="intro"><a href="/">Back to the catalog</a> or <a href="/categories">browse by category</a>.</p>`,
     categories,
     noindex: true
   });
@@ -918,7 +1056,7 @@ function renderSitemap({ apis, categories, lastBuild }) {
 
 function llmsLine(api, { withOwner = false } = {}) {
   const desc = truncate(api.description || '', 140);
-  const owner = withOwner ? ownerFromApi(api) : null;
+  const owner = withOwner ? (api.provider || ownerFromApi(api)) : null;
   return `- [${cleanText(api.name)}](${apiUrl(api)})${owner ? ` (${owner})` : ''}${desc ? `: ${desc}` : ''}`;
 }
 
@@ -932,6 +1070,7 @@ function renderLlmsTxt({ totalApis, categories, topApis }) {
 - Each API page lives at ${SITE_URL}/apis/<slug> and includes the full endpoint reference with code examples in many languages.
 - The raw OpenAPI document for an API is available at ${SITE_URL}/apis/<slug>/openapi.json.
 - A Bruno collection (ZIP) for an API is available from the download link on its page.
+- JSON search across the catalog: ${SITE_URL}/api/apis?search=<query> (returns name, tags, provider, endpoint count and links).
 - Category pages list every API on a topic: ${SITE_URL}/category/<category-slug>.
 - The complete index with one line per API is at ${SITE_URL}/llms-full.txt.
 
@@ -981,6 +1120,8 @@ module.exports = {
   buildCategories,
   categoriesForApi,
   specFacts,
+  endpointGroups,
+  apiOwner,
   pageTitle,
   metaDescription,
   apiUrl,

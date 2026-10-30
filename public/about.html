@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,285 +19,77 @@
   <meta name="twitter:title" content="About OpenAPI Catalog – How We Collect Public API Specs">
   <meta name="twitter:description" content="How OpenAPI Catalog discovers public OpenAPI specifications, converts each one to a Bruno collection, and generates docs.">
   <meta name="twitter:image" content="https://openapicatalog.com/og-image.png">
-  <meta name="theme-color" content="#3b82f6">
+  <meta name="theme-color" content="#0b0c0e">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "AboutPage", "@id": "https://openapicatalog.com/about", "url": "https://openapicatalog.com/about", "name": "About OpenAPI Catalog", "isPartOf": {"@id": "https://openapicatalog.com/#website"}, "description": "How OpenAPI Catalog collects public OpenAPI specifications from GitHub and APIs.guru, converts them to Bruno collections, and generates documentation."}, {"@type": "Organization", "@id": "https://openapicatalog.com/#organization", "name": "OpenAPI Catalog", "url": "https://openapicatalog.com/", "logo": "https://openapicatalog.com/apple-touch-icon.png"}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "OpenAPI Catalog", "item": "https://openapicatalog.com/"}, {"@type": "ListItem", "position": 2, "name": "About", "item": "https://openapicatalog.com/about"}]}]}</script>
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is OpenAPI Catalog?", "acceptedAnswer": {"@type": "Answer", "text": "OpenAPI Catalog is a free, open-source directory of public OpenAPI and Swagger specifications. It collects specs from GitHub repositories and the APIs.guru directory, generates interactive endpoint documentation from each one, and packages every API as a Bruno collection you can open in the Bruno API client."}}, {"@type": "Question", "name": "Where do the API specifications come from?", "acceptedAnswer": {"@type": "Answer", "text": "Specs come from two sources: a scraper that searches public GitHub repositories for openapi.json, openapi.yaml and swagger.json files, and a sync with the APIs.guru directory of official API descriptions. Each API page links back to its original source so you can verify it."}}, {"@type": "Question", "name": "What is a Bruno collection and how do I import one?", "acceptedAnswer": {"@type": "Answer", "text": "Bruno is an open-source, Git-friendly API client that stores collections as plain files on disk. To use an API from this catalog, download its collection ZIP, unzip it, open Bruno, choose Open Collection, and select the folder. Then set the baseUrl variable and any credentials and start sending requests."}}, {"@type": "Question", "name": "Can I get the raw OpenAPI file for an API?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Every API page has an OpenAPI spec (JSON) link, and the same document is available by appending /openapi.json to the API's URL, for example https://openapicatalog.com/apis/your-api/openapi.json."}}, {"@type": "Question", "name": "Are the APIs free to use?", "acceptedAnswer": {"@type": "Answer", "text": "The catalog itself is free. Each API is owned by its provider and has its own terms, pricing, and authentication requirements. The Source link on every API page points to the provider or repository where those terms are published."}}, {"@type": "Question", "name": "How are APIs categorized?", "acceptedAnswer": {"@type": "Answer", "text": "Each API is tagged with one or more categories such as Cloud & Infrastructure, Payments, or Developer Tools, based on metadata from APIs.guru and keywords in the spec and repository. Category pages list every API on a topic, ranked by GitHub stars."}}, {"@type": "Question", "name": "Is there a machine-readable index for AI assistants and crawlers?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. /llms.txt gives a short overview with category links and popular APIs, /llms-full.txt lists every API with a one-line description, and /sitemap.xml lists every page. The site also publishes schema.org structured data on every API and category page."}}]}</script>
-  <style>
-    :root {
-      --primary: #3b82f6;
-      --bg-primary: #ffffff;
-      --bg-secondary: #f8f9fa;
-      --bg-tertiary: #e9ecef;
-      --text-primary: #1a1a1a;
-      --text-secondary: #6c757d;
-      --border: #dee2e6;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: var(--text-primary);
-      line-height: 1.6;
-      min-height: 100vh;
-      padding: 2rem 0;
-    }
-
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0 2rem;
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-      margin-bottom: 2rem;
-      transition: opacity 0.2s;
-    }
-
-    .back-link:hover {
-      opacity: 0.8;
-    }
-
-    .content-card {
-      background: var(--bg-primary);
-      border-radius: 16px;
-      padding: 3rem;
-      box-shadow: var(--shadow-md);
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .logo {
-      height: 48px;
-      width: auto;
-    }
-
-    h2 {
-      font-size: 1.75rem;
-      font-weight: 600;
-      margin-top: 2.5rem;
-      margin-bottom: 1rem;
-      color: var(--text-primary);
-    }
-
-    h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-top: 1.5rem;
-      margin-bottom: 0.75rem;
-      color: var(--text-primary);
-    }
-
-    p {
-      margin-bottom: 1rem;
-      color: var(--text-secondary);
-      font-size: 1.05rem;
-    }
-
-    ul, ol {
-      margin-bottom: 1.5rem;
-      margin-left: 1.5rem;
-      color: var(--text-secondary);
-    }
-
-    li {
-      margin-bottom: 0.5rem;
-      font-size: 1.05rem;
-    }
-
-    strong {
-      color: var(--text-primary);
-      font-weight: 600;
-    }
-
-    .highlight {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-weight: 700;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin: 2rem 0;
-    }
-
-    .stat-card {
-      background: var(--bg-secondary);
-      padding: 1.5rem;
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 0.5rem;
-    }
-
-    .stat-label {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      font-weight: 500;
-    }
-
-    .feature-list {
-      list-style: none;
-      margin-left: 0;
-    }
-
-    .feature-list li {
-      padding-left: 2rem;
-      position: relative;
-      margin-bottom: 1rem;
-    }
-
-    .feature-list li:before {
-      content: "✓";
-      position: absolute;
-      left: 0;
-      color: var(--primary);
-      font-weight: 700;
-      font-size: 1.25rem;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      margin-right: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .badge-github {
-      background: #3b82f6;
-      color: white;
-    }
-
-    .badge-apisguru {
-      background: #8b5cf6;
-      color: white;
-    }
-
-    code {
-      background: var(--bg-secondary);
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      font-family: 'Monaco', 'Courier New', monospace;
-      font-size: 0.9rem;
-      color: var(--text-primary);
-    }
-
-    @media (max-width: 768px) {
-      .content-card {
-        padding: 2rem 1.5rem;
+  <script>
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') {
+        t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
       }
-
-      h1 {
-        font-size: 2rem;
-      }
-
-      h2 {
-        font-size: 1.5rem;
-      }
-    }
-    .faq-item { margin-bottom: 1.5rem; }
-    .faq-item h3 { margin-bottom: 0.4rem; }
-    .faq-item p { margin: 0; }
-  </style>
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/site.css">
 </head>
 <body>
-  <div class="container">
-    <a href="/" class="back-link">
-      <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-      </svg>
-      Back to Catalog
-    </a>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="wordmark" href="/">OpenAPI Catalog</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">APIs</a>
+        <a href="/categories">Categories</a>
+        <a href="/about">About</a>
+      </nav>
+      <div class="spacer"></div>
+      <a class="site-llms" href="/llms.txt">llms.txt</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme">Light</button>
+    </div>
+  </header>
 
-    <div class="content-card">
-      <h1>
-        About OpenAPI Catalog
-      </h1>
+  <main class="page">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Catalog</a><span>/</span><span class="current">About</span></nav>
+    <h1 class="page-title">About OpenAPI Catalog</h1>
+    <p class="page-lede">A catalog of public OpenAPI specifications, collected automatically from GitHub and APIs.guru, with generated endpoint docs, the raw spec, and a ready-to-import Bruno collection for each one.</p>
 
-      <p style="font-size: 1.15rem; color: var(--text-primary); margin-bottom: 2rem;">
-        The <span class="highlight">largest</span> OpenAPI-backed API catalog, automatically curated from GitHub and APIs.guru, with ready-to-use Bruno collections and interactive documentation.
-      </p>
+    <dl class="facts" style="max-width:720px">
+      <div><dt>OpenAPI specifications</dt><dd><span data-ssr="count">3,000+</span></dd></div>
+      <div><dt>Categories</dt><dd><span data-ssr="categories">30+</span></dd></div>
+      <div><dt>Data sources</dt><dd>GitHub, APIs.guru</dd></div>
+      <div><dt>Machine-readable</dt><dd><a href="/llms.txt">llms.txt</a>, <a href="/llms-full.txt">llms-full.txt</a>, <a href="/sitemap.xml">sitemap.xml</a></dd></div>
+    </dl>
 
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value" id="totalApis">3,000+</div>
-          <div class="stat-label">OpenAPI Specifications</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">2</div>
-          <div class="stat-label">Data Sources</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">100%</div>
-          <div class="stat-label">Bruno Compatible</div>
-        </div>
-      </div>
-
-      <h2>What is This?</h2>
-      <p>
-        OpenAPI Catalog is an automated service that discovers, converts, and catalogs public OpenAPI specifications from across the web. Every API in our catalog comes with:
-      </p>
-      <ul class="feature-list">
-        <li><strong>Bruno Collection</strong> - Ready to download and import into Bruno</li>
-        <li><strong>Interactive Documentation</strong> - Auto-generated HTML docs for easy exploration</li>
-        <li><strong>Source Information</strong> - Links to original GitHub repos or official sources</li>
-        <li><strong>Categorization</strong> - Organized into <a href="/categories" style="color: var(--primary);">categories</a> for easy discovery</li>
+    <div class="prose">
+      <h2>What is this?</h2>
+      <p>OpenAPI Catalog is an automated service that discovers, converts, and catalogs public OpenAPI specifications from across the web. Every API in the catalog comes with:</p>
+      <ul>
+        <li><strong>Bruno collection</strong>: ready to download and open in Bruno</li>
+        <li><strong>Endpoint documentation</strong>: generated from the spec, with code samples in nine languages</li>
+        <li><strong>Raw OpenAPI document</strong>: JSON, at a stable URL for tools and agents</li>
+        <li><strong>Source information</strong>: links to the original GitHub repository or official source</li>
+        <li><strong>Categorization</strong>: organized into <a href="/categories">categories</a> for easy discovery</li>
       </ul>
 
-      <h2>Data Sources</h2>
-      <p>We aggregate OpenAPI specifications from two primary sources:</p>
-
-      <h3><span class="badge badge-github">GitHub</span> GitHub Scraper</h3>
-      <p>
-        Our custom scraper searches GitHub for public repositories containing OpenAPI specifications (<code>openapi.json</code>, <code>openapi.yaml</code>, <code>swagger.json</code>, etc.). This gives us:
-      </p>
+      <h2>Data sources</h2>
+      <p>Specifications are aggregated from two primary sources.</p>
+      <h3>GitHub scraper</h3>
+      <p>A scraper searches GitHub for public repositories containing OpenAPI specifications (<code>openapi.json</code>, <code>openapi.yaml</code>, <code>swagger.json</code>, and similar). This gives us:</p>
       <ul>
         <li><strong>Hundreds of APIs</strong> from community projects and open-source tools</li>
         <li><strong>Star counts</strong> as a quality signal</li>
         <li><strong>Direct GitHub links</strong> to the source repositories</li>
-        <li><strong>Automatic categorization</strong> based on keywords and repo metadata</li>
+        <li><strong>Automatic categorization</strong> based on keywords and repository metadata</li>
       </ul>
-
-      <h3><span class="badge badge-apisguru">APIs.guru</span> APIs.guru Import</h3>
-      <p>
-        We import the comprehensive <a href="https://apis.guru" target="_blank" style="color: var(--primary);">APIs.guru</a> catalog, which includes:
-      </p>
+      <h3>APIs.guru import</h3>
+      <p>We import the <a href="https://apis.guru" target="_blank" rel="noopener">APIs.guru</a> directory, which includes:</p>
       <ul>
         <li><strong>Thousands of APIs</strong> from hundreds of providers</li>
         <li><strong>Official APIs</strong> from AWS, Azure, Google Cloud, Stripe, Twilio, and more</li>
@@ -305,41 +97,49 @@
         <li><strong>Rich metadata</strong> including categories, logos, and provider information</li>
       </ul>
 
-      <h2>How It Works</h2>
+      <h2>How it works</h2>
       <ol>
-        <li><strong>Discovery</strong> - We continuously scan GitHub and sync with APIs.guru</li>
-        <li><strong>Download</strong> - OpenAPI specs are downloaded and validated</li>
-        <li><strong>Conversion</strong> - Each spec is converted to a Bruno collection using <code>bruno-doc-gen</code></li>
-        <li><strong>Documentation</strong> - Interactive HTML documentation is auto-generated</li>
-        <li><strong>Cataloging</strong> - APIs are tagged, categorized, and made searchable</li>
+        <li><strong>Discovery</strong>: we continuously scan GitHub and sync with APIs.guru</li>
+        <li><strong>Download</strong>: OpenAPI specs are downloaded and validated</li>
+        <li><strong>Conversion</strong>: each spec is converted to a Bruno collection using <code>bruno-doc-gen</code></li>
+        <li><strong>Documentation</strong>: endpoint documentation is generated from the collection</li>
+        <li><strong>Cataloging</strong>: APIs are tagged, categorized, and made searchable</li>
       </ol>
 
-      <h2>Technology Stack</h2>
+      <h2>For agents and tools</h2>
+      <p>Everything on the site is also available as plain text or JSON:</p>
       <ul>
-        <li><strong>Backend</strong> - Node.js + Express</li>
-        <li><strong>Database</strong> - SQLite (lightweight, fast, portable)</li>
-        <li><strong>Scraping</strong> - GitHub API via Octokit</li>
-        <li><strong>Conversion</strong> - bruno-doc-gen (OpenAPI → Bruno)</li>
-        <li><strong>Storage</strong> - File system for specs, collections, and docs</li>
+        <li><code>GET /llms.txt</code>: short overview with category links and the most popular APIs</li>
+        <li><code>GET /llms-full.txt</code>: every API, one line each</li>
+        <li><code>GET /api/apis?search={query}</code>: JSON search with name, tags, provider, endpoint count, and links</li>
+        <li><code>GET /apis/{slug}/openapi.json</code>: the raw OpenAPI document for any entry</li>
+        <li><code>GET /api/apis/{id}/download</code>: the Bruno collection as a ZIP</li>
+      </ul>
+
+      <h2>Technology</h2>
+      <ul>
+        <li><strong>Backend</strong>: Node.js and Express</li>
+        <li><strong>Database</strong>: SQLite</li>
+        <li><strong>Scraping</strong>: GitHub API via Octokit</li>
+        <li><strong>Conversion</strong>: bruno-doc-gen (OpenAPI to Bruno)</li>
+        <li><strong>Storage</strong>: file system for specs, collections, and docs</li>
       </ul>
 
       <h2>Why Bruno?</h2>
-      <p>
-        <a href="https://www.usebruno.com/" target="_blank" style="color: var(--primary);"><strong>Bruno</strong></a> is a fast, Git-friendly, open-source API client that stores collections directly in your filesystem. Unlike cloud-based alternatives, Bruno gives you:
-      </p>
-      <ul class="feature-list">
+      <p><a href="https://www.usebruno.com/" target="_blank" rel="noopener"><strong>Bruno</strong></a> is a fast, Git-friendly, open-source API client that stores collections directly in your filesystem. Unlike cloud-based alternatives, Bruno gives you:</p>
+      <ul>
         <li>Full control over your API collections</li>
         <li>Git-based version control</li>
         <li>Offline-first functionality</li>
         <li>Privacy and security (no cloud sync required)</li>
       </ul>
 
-      <h2>Get Started</h2>
-      <p>
-        <a href="/" style="color: var(--primary);">Browse the catalog</a>, find an API you're interested in, and click the <strong>Bruno</strong> button to download the collection as a ZIP file. Extract it and open it in Bruno to start making requests immediately!
-      </p>
+      <h2>Get started</h2>
+      <p><a href="/">Browse the catalog</a>, find an API, and use the <strong>Collection</strong> button to download it as a ZIP. Unzip it and open the folder in Bruno to start sending requests.</p>
+    </div>
 
-      <h2 id="faq">Frequently Asked Questions</h2>
+    <h2 id="faq">Frequently asked questions</h2>
+    <div class="faq">
       <div class="faq-item">
         <h3>What is OpenAPI Catalog?</h3>
         <p>OpenAPI Catalog is a free, open-source directory of public OpenAPI and Swagger specifications. It collects specs from GitHub repositories and the APIs.guru directory, generates interactive endpoint documentation from each one, and packages every API as a Bruno collection you can open in the Bruno API client.</p>
@@ -368,22 +168,19 @@
         <h3>Is there a machine-readable index for AI assistants and crawlers?</h3>
         <p>Yes. <a href="/llms.txt">/llms.txt</a> gives a short overview with category links and popular APIs, <a href="/llms-full.txt">/llms-full.txt</a> lists every API with a one-line description, and <a href="/sitemap.xml">/sitemap.xml</a> lists every page. The site also publishes schema.org structured data on every API and category page.</p>
       </div>
-
-      <p style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-secondary); font-size: 0.95rem;">
-        <strong>Note:</strong> This is an independent project and is not officially affiliated with Bruno or APIs.guru. All OpenAPI specifications are sourced from public repositories and catalogs.
-      </p>
     </div>
-  </div>
 
-  <script>
-    // Load stats
-    fetch('/api/stats')
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('totalApis').textContent = data.totalApis.toLocaleString();
-      })
-      .catch(err => console.error('Error loading stats:', err));
-  </script>
+    <p class="footnote"><strong>Note:</strong> This is an independent project and is not officially affiliated with Bruno or APIs.guru. All OpenAPI specifications are sourced from public repositories and catalogs.</p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>Specs from GitHub and APIs.guru. Built for the <a class="bruno" href="https://www.usebruno.com/" rel="noopener">Bruno</a> API client community.</span>
+      <span class="footer-links"><a href="/about">About</a><a href="/categories">Categories</a><a href="/llms.txt">llms.txt</a><a href="/llms-full.txt">llms-full.txt</a></span>
+    </div>
+    <!--SSR:CATEGORIES-->
+  </footer>
+
+  <script src="/site.js"></script>
 </body>
 </html>
-
